@@ -1,17 +1,4 @@
 <!DOCTYPE html>
-<script type="application/json" id="cowork-artifact-meta">
-{
-  "name": "Relic Fulfillment Dashboard",
-  "schemaVersion": 1,
-  "description": "Phase 1 internal fulfillment dashboard for Maurizio + Liza. Reads live from arkive_relics + capsules + accounts via Supabase MCP. Walks each Relic order through six phases: order info → photos for print partner (signed download URLs via relic-fulfillment-data edge function) → letter for print partner → NFC URL (copy-paste into NFC Tools / TagWriter) → seal → ship + track. Per-phase timestamp updates write directly to arkive_relics. Notes textarea saves on blur.",
-  "mcpTools": [
-    "mcp__90a60bc2-15f7-4b75-9a8b-4436496f5446__execute_sql"
-  ],
-  "mcpServerNames": [
-    "Supabase"
-  ]
-}
-</script>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -224,64 +211,35 @@ details[open] summary { color: var(--text); }
 <div class="container">
   <header class="page-header">
     <h1 class="page-title">Relic Fulfillment</h1>
-    <p class="page-sub">Walk each order through the six fulfillment phases. Status updates write directly to <code>arkive_relics</code>. Use the Reload button in the artifact header to refresh.</p>
+    <p class="page-sub">Walk each order through the six fulfillment phases. Status updates write directly to <code>arkive_relics</code> via the Supabase REST API. Click Reload to refresh.</p>
     <div class="toolbar">
       <button class="filter-btn active" data-filter="active">Active orders</button>
       <button class="filter-btn" data-filter="all">All</button>
       <button class="filter-btn" data-filter="shipped">Shipped + delivered</button>
+      <button class="filter-btn" id="reloadBtn" style="margin-left:auto;">Reload</button>
     </div>
     <div class="summary-row" id="summaryRow"></div>
   </header>
 
   <div id="status"></div>
   <div id="orders"></div>
-  <div id="debugPanel" style="margin-top:24px;"></div>
 </div>
 
 <div id="toast" class="toast"></div>
 
 <script>
-const PROJECT_ID = 'skrwdjxgvryodsxusqia';
+const SUPABASE_URL = 'https://skrwdjxgvryodsxusqia.supabase.co';
 const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrcndkanhndnJ5b2RzeHVzcWlhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNzIxMjMsImV4cCI6MjA4OTk0ODEyM30.pmgv9jxIxwcKnJxq3Rz302zJQkAFccKqOa_g6SWFX0Q';
-const FN_URL = `https://${PROJECT_ID}.supabase.co/functions/v1/relic-fulfillment-data`;
-const SQL_TOOL = 'mcp__90a60bc2-15f7-4b75-9a8b-4436496f5446__execute_sql';
+const REST = SUPABASE_URL + '/rest/v1';
+const REST_HEADERS = { apikey: ANON_KEY, Authorization: 'Bearer ' + ANON_KEY };
 
 let allRelics = [];
-let photoCache = {}; // relic_id -> { photos: [...], letters: [...], expires_at }
 let currentFilter = 'active';
 
 function setStatus(msg, isError) {
   const el = document.getElementById('status');
   el.textContent = msg || '';
   el.className = isError ? 'error' : '';
-}
-
-function renderDebugPanel() {
-  const el = document.getElementById('debugPanel');
-  if (!el) return;
-  if (!_lastRawResponse) { el.innerHTML = ''; return; }
-  let preview = '';
-  try {
-    if (typeof _lastRawResponse === 'string') {
-      preview = _lastRawResponse.slice(0, 4000);
-    } else {
-      preview = JSON.stringify(_lastRawResponse, null, 2).slice(0, 6000);
-    }
-  } catch (e) { preview = '[unstringifiable: ' + e.message + ']'; }
-  const keys = (_lastRawResponse && typeof _lastRawResponse === 'object' && !Array.isArray(_lastRawResponse))
-    ? Object.keys(_lastRawResponse).join(', ')
-    : '(not an object)';
-  el.innerHTML = `
-    <details style="background:#FBF8F1;border:1px solid var(--border);border-radius:8px;padding:12px 16px;">
-      <summary style="cursor:pointer;font-weight:600;color:var(--text);">▸ Debug — last MCP response shape (click to expand)</summary>
-      <div style="margin-top:10px;font-size:12px;color:var(--text-muted);">
-        <div><strong>Type:</strong> ${typeof _lastRawResponse} ${Array.isArray(_lastRawResponse) ? '(Array, length '+_lastRawResponse.length+')' : ''}</div>
-        <div><strong>Top-level keys:</strong> ${escapeHtml(keys)}</div>
-        <div><strong>Loaded rows:</strong> ${allRelics.length}</div>
-        <pre style="background:#FFFFFF;border:1px solid var(--border);border-radius:6px;padding:10px;font-size:11px;line-height:1.5;overflow:auto;max-height:400px;margin-top:10px;white-space:pre-wrap;word-break:break-all;">${escapeHtml(preview)}${preview.length >= 4000 ? '\n…(truncated)' : ''}</pre>
-      </div>
-    </details>
-  `;
 }
 
 function showLoading(show) {
@@ -295,184 +253,81 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 1800);
 }
 
-function escapeSql(s) { return String(s == null ? '' : s).replace(/'/g, "''"); }
 function escapeHtml(s) {
   if (s == null) return '';
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
-// Robust SQL runner. Always returns an Array of row objects.
-// Stores last raw response globally so we can render an inline debug view.
-let _lastRawResponse = null;
-function _coerceToRows(value) {
-  // Already an array
-  if (Array.isArray(value)) return value;
-  // Object — dig for common row-array keys
-  if (value && typeof value === 'object') {
-    for (const key of ['rows', 'data', 'records', 'results', 'result']) {
-      const v = value[key];
-      if (Array.isArray(v)) return v;
-      if (v && typeof v === 'object' && !Array.isArray(v)) {
-        const nested = _coerceToRows(v);
-        if (Array.isArray(nested)) return nested;
-      }
-    }
-    // Do NOT wrap a non-row object as [object] — that creates phantom rows.
-    // If we can't find an array, we genuinely have no rows.
+async function restGet(path) {
+  const res = await fetch(REST + path, { headers: REST_HEADERS });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`GET ${path} → ${res.status}: ${body.slice(0, 200)}`);
   }
-  return null; // null = "couldn't extract", caller decides what to do
-}
-// Recursive row extractor. Accepts any value (object, string, array) and digs
-// through MCP envelopes, JSON-stringified payloads, Supabase {result:"..."}
-// wrappers, and <untrusted-data-XXX>...</untrusted-data-XXX> bounded blocks.
-// Returns the first Array it finds, or null if none.
-function _extractRows(value, depth) {
-  if (depth == null) depth = 0;
-  if (depth > 6) return null; // recursion guard
-  if (value == null) return null;
-  // Direct array
-  if (Array.isArray(value)) return value;
-  // String: try multiple parse paths, then recurse on the parsed value
-  if (typeof value === 'string') {
-    // Try <untrusted-data-XYZ>JSON</untrusted-data-XYZ> first (longest match for embedded brackets)
-    const wrapped = value.match(/<untrusted-data-[\w-]+>\s*([\s\S]*?)\s*<\/untrusted-data-[\w-]+>/);
-    if (wrapped) {
-      try {
-        const parsed = JSON.parse(wrapped[1]);
-        const r = _extractRows(parsed, depth + 1);
-        if (Array.isArray(r)) return r;
-      } catch (e) { /* fall through */ }
-    }
-    // Try the whole string as JSON
-    try {
-      const parsed = JSON.parse(value);
-      const r = _extractRows(parsed, depth + 1);
-      if (Array.isArray(r)) return r;
-    } catch (e) { /* fall through */ }
-    // Try greedy top-level array regex
-    const arrMatch = value.match(/\[[\s\S]*\]/);
-    if (arrMatch) {
-      try {
-        const parsed = JSON.parse(arrMatch[0]);
-        if (Array.isArray(parsed)) return parsed;
-      } catch (e) { /* fall through */ }
-    }
-    return null;
-  }
-  // Object: walk MCP-standard envelope keys and Supabase wrapper keys
-  if (typeof value === 'object') {
-    // MCP standard: { content: [{ type, text }] }
-    if (Array.isArray(value.content)) {
-      for (const c of value.content) {
-        if (c && typeof c.text === 'string') {
-          const r = _extractRows(c.text, depth + 1);
-          if (Array.isArray(r)) return r;
-        }
-      }
-    }
-    // Supabase wrapper / generic row containers
-    for (const key of ['rows', 'data', 'records', 'results', 'result']) {
-      if (value[key] != null) {
-        const r = _extractRows(value[key], depth + 1);
-        if (Array.isArray(r)) return r;
-      }
-    }
-    // Fallthrough properties to consider
-    if (typeof value.text === 'string') {
-      const r = _extractRows(value.text, depth + 1);
-      if (Array.isArray(r)) return r;
-    }
-    return null;
-  }
-  return null;
+  return res.json();
 }
 
-async function runSql(query) {
-  const raw = await window.cowork.callMcpTool(SQL_TOOL, {
-    project_id: PROJECT_ID,
-    query: query
+async function restPatch(path, body) {
+  const res = await fetch(REST + path, {
+    method: 'PATCH',
+    headers: { ...REST_HEADERS, 'Content-Type': 'application/json', Prefer: 'return=representation' },
+    body: JSON.stringify(body)
   });
-  _lastRawResponse = raw;
-  if (raw && typeof raw === 'object' && raw.isError) {
-    const errMsg = raw?.content?.[0]?.text || JSON.stringify(raw);
-    throw new Error('SQL error: ' + errMsg);
+  if (!res.ok) {
+    const t = await res.text();
+    throw new Error(`PATCH ${path} → ${res.status}: ${t.slice(0, 200)}`);
   }
-  if (raw && typeof raw === 'object' && raw.error) {
-    throw new Error('SQL error: ' + (raw.error?.message || JSON.stringify(raw.error)));
-  }
-  const rows = _extractRows(raw);
-  if (Array.isArray(rows)) return rows;
-  console.error('[runSql] Could not extract row array. Raw:', raw);
-  throw new Error('Could not parse SQL response. See debug panel below.');
-}
-
-async function fireEdgeFunction(body) {
-  // Step 1: fire request
-  const fireSql = `SELECT net.http_post(
-    url := '${FN_URL}',
-    headers := '{"Authorization": "Bearer ${ANON_KEY}", "Content-Type": "application/json"}'::jsonb,
-    body := '${escapeSql(JSON.stringify(body))}'::jsonb
-  ) AS request_id;`;
-  const fireResult = await runSql(fireSql);
-  const requestId = fireResult?.[0]?.request_id;
-  if (!requestId) throw new Error('Failed to fire edge function: no request id');
-
-  // Step 2: poll for response (up to 25s, 1s intervals)
-  for (let i = 0; i < 25; i++) {
-    await new Promise(r => setTimeout(r, 1000));
-    const pollResult = await runSql(`SELECT status_code, content::text AS content FROM net._http_response WHERE id = ${requestId} LIMIT 1;`);
-    const row = pollResult?.[0];
-    if (row && row.status_code) {
-      try { return JSON.parse(row.content); }
-      catch (e) { throw new Error('Bad response from edge function: ' + row.content?.slice(0, 200)); }
-    }
-  }
-  throw new Error('Edge function timed out after 25s');
+  return res.json();
 }
 
 async function loadAllRelics() {
   showLoading(true);
   setStatus('Loading orders…');
   try {
-    // Pull every relic + purchaser + capsule letters via SQL (fast).
-    // Filters chosen letter via letter_id; we pass selected_photo_ids through
-    // for the photo loader to filter against.
-    const query = `
-      SELECT
-        r.id, r.creator_user_id, r.capsule_id, r.order_status, r.ordered_at, r.price, r.currency,
-        r.recipient_name, r.capsule_title, r.photo_count, r.has_letter,
-        r.shipping_recipient_full_name, r.shipping_street, r.shipping_city,
-        r.shipping_postal_code, r.shipping_country, r.shipping_phone,
-        r.tracking_number, r.shipped_at, r.delivered_at, r.nfc_deep_link,
-        r.confirmation_email_sent_at, r.delivery_date,
-        r.photos_printed_at, r.letter_printed_at, r.nfc_encoded_at, r.sealed_at,
-        r.fulfillment_notes, r.letter_content_snapshot, r.letter_id, r.selected_photo_ids,
-        a.email AS purchaser_email, a.display_name AS purchaser_name,
-        c.title AS capsule_full_title,
-        -- Filtered letter: only the one matching r.letter_id (if set), else null
-        (SELECT to_jsonb(jsonb_build_object('id', e->>'id', 'title', e->>'title', 'body', e->>'subtitle', 'sort_index', (e->>'sort_index')::int))
-         FROM jsonb_array_elements(c.items_json) e
-         WHERE e->>'kind' = 'Letter' AND e->>'id' = r.letter_id::text
-         LIMIT 1) AS chosen_letter
-      FROM arkive_relics r
-      LEFT JOIN accounts a ON a.id = r.creator_user_id
-      LEFT JOIN capsules c ON c.id = r.capsule_id
-      ORDER BY r.ordered_at DESC;
-    `;
-    const rows = await runSql(query);
-    if (!Array.isArray(rows)) {
-      console.error('[loadAllRelics] runSql returned non-array:', rows);
-      allRelics = [];
-      throw new Error('Query returned non-array result. See console.');
-    }
-    allRelics = rows;
+    const relics = await restGet('/arkive_relics?select=*&order=ordered_at.desc');
+    const userIds = [...new Set(relics.map(r => r.creator_user_id).filter(Boolean))];
+    const capsuleIds = [...new Set(relics.map(r => r.capsule_id).filter(Boolean))];
+    const [accounts, capsules] = await Promise.all([
+      userIds.length
+        ? restGet(`/accounts?select=id,email,display_name&id=in.(${userIds.join(',')})`)
+        : Promise.resolve([]),
+      capsuleIds.length
+        ? restGet(`/capsules?select=id,title,items_json&id=in.(${capsuleIds.join(',')})`)
+        : Promise.resolve([])
+    ]);
+    const accountById = Object.fromEntries(accounts.map(a => [a.id, a]));
+    const capsuleById = Object.fromEntries(capsules.map(c => [c.id, c]));
+
+    allRelics = relics.map(r => {
+      const acc = accountById[r.creator_user_id];
+      const caps = capsuleById[r.capsule_id];
+      let chosenLetter = null;
+      if (caps && Array.isArray(caps.items_json) && r.letter_id) {
+        const found = caps.items_json.find(e =>
+          e && e.kind === 'Letter' && String(e.id) === String(r.letter_id)
+        );
+        if (found) {
+          chosenLetter = {
+            id: found.id,
+            title: found.title,
+            body: found.subtitle,
+            sort_index: found.sort_index != null ? parseInt(found.sort_index, 10) : 0
+          };
+        }
+      }
+      return Object.assign({}, r, {
+        purchaser_email: acc?.email || null,
+        purchaser_name: acc?.display_name || null,
+        capsule_full_title: caps?.title || null,
+        chosen_letter: chosenLetter
+      });
+    });
+
     renderSummary();
     renderOrders();
     setStatus(`Loaded ${allRelics.length} order${allRelics.length === 1 ? '' : 's'}.`);
-    renderDebugPanel();
   } catch (e) {
     setStatus('Failed to load: ' + e.message, true);
-    renderDebugPanel();
   } finally {
     showLoading(false);
   }
@@ -733,8 +588,11 @@ async function markPhase(relicId, field) {
   showLoading(true);
   setStatus(`Marking ${field}…`);
   try {
-    await runSql(`UPDATE arkive_relics SET ${field} = NOW(), updated_at = NOW() WHERE id = '${escapeSql(relicId)}'::uuid;`);
-    // Refresh
+    const now = new Date().toISOString();
+    await restPatch(`/arkive_relics?id=eq.${encodeURIComponent(relicId)}`, {
+      [field]: now,
+      updated_at: now
+    });
     await loadAllRelics();
     showToast('Updated');
   } catch (e) {
@@ -753,14 +611,13 @@ async function markShipped(relicId) {
   showLoading(true);
   setStatus('Marking shipped…');
   try {
-    await runSql(`
-      UPDATE arkive_relics
-      SET shipped_at = NOW(),
-          tracking_number = '${escapeSql(tracking)}',
-          order_status = 'Shipped',
-          updated_at = NOW()
-      WHERE id = '${escapeSql(relicId)}'::uuid;
-    `);
+    const now = new Date().toISOString();
+    await restPatch(`/arkive_relics?id=eq.${encodeURIComponent(relicId)}`, {
+      shipped_at: now,
+      tracking_number: tracking,
+      order_status: 'Shipped',
+      updated_at: now
+    });
     await loadAllRelics();
     showToast('Shipped');
   } catch (e) {
@@ -771,112 +628,41 @@ async function markShipped(relicId) {
 
 async function saveNotes(relicId, value) {
   try {
-    await runSql(`UPDATE arkive_relics SET fulfillment_notes = '${escapeSql(value)}', updated_at = NOW() WHERE id = '${escapeSql(relicId)}'::uuid;`);
+    await restPatch(`/arkive_relics?id=eq.${encodeURIComponent(relicId)}`, {
+      fulfillment_notes: value,
+      updated_at: new Date().toISOString()
+    });
     showToast('Notes saved');
   } catch (e) {
     setStatus('Notes save failed: ' + e.message, true);
   }
 }
 
-async function loadPhotos(relicId) {
+function loadPhotos(relicId) {
   const container = document.getElementById(`photos-${relicId}`);
   if (!container) return;
-  const relicRow = allRelics.find(r => r.id === relicId);
-  const expectedCount = relicRow?.photo_count || 0;
-  const selectedIds = Array.isArray(relicRow?.selected_photo_ids) ? relicRow.selected_photo_ids : null;
-  container.innerHTML = `<div class="muted tiny" style="margin-top:10px;">Generating signed download URLs… (5–10s)</div>`;
-  try {
-    const data = await fireEdgeFunction({ relic_id: relicId });
-    const relic = data?.relics?.[0];
-    if (!relic) throw new Error('No data returned');
-    let photos = relic.photos || [];
-    let selectionUnknown = false;
-    let totalInCapsule = photos.length;
-    // Filter to selected_photo_ids if present
-    if (selectedIds && selectedIds.length > 0) {
-      const idSet = new Set(selectedIds);
-      photos = photos.filter(p => idSet.has(p.id));
-    } else {
-      selectionUnknown = true;
-    }
-    if (photos.length === 0) {
-      container.innerHTML = `<div class="muted tiny">No photos found for this order.</div>`;
-      return;
-    }
-    photoCache[relicId] = { photos, expires_at: Date.now() + 3500 * 1000 };
-    const warning = selectionUnknown ? `
-      <div style="background:#FFF4E0;border:1px solid var(--accent);border-radius:6px;padding:10px 12px;margin:10px 0;font-size:12px;color:var(--text);">
-        <strong>⚠ Photo selection not yet stored.</strong>
-        Capsule contains <strong>${totalInCapsule}</strong> photos; customer ordered <strong>${expectedCount}</strong> for printing.
-        The iOS Builder doesn't yet write the customer's specific selection to <code>arkive_relics.selected_photo_ids</code>.
-        Until that PR ships, send <strong>all ${totalInCapsule}</strong> photos to the print partner OR coordinate with the customer to identify the ${expectedCount} they wanted. Reach out to Maurizio to ratify.
-      </div>` : `
-      <div class="muted tiny" style="margin:10px 0 6px;">
-        ✓ Showing ${photos.length} customer-selected photo${photos.length === 1 ? '' : 's'} (filtered from ${totalInCapsule} in capsule). Signed URLs valid 1 hour. Open the artifact in your browser tab to download tiles.
-      </div>`;
-    // Numbered tiles. Cowork sandbox blocks inline <img> network loads, so we
-    // use clean numbered placeholder cards with prominent download links.
-    // Clicking a tile opens the signed URL in a new browser tab where the
-    // browser handles the download outside the sandbox.
-    container.innerHTML = `
-      ${warning}
-      <div class="actions" style="margin-bottom:8px;">
-        <button class="btn btn-accent" onclick="downloadAllPhotos('${escapeHtml(relicId)}')">Download all (sequential)</button>
-        <button class="btn" onclick="copyAllPhotoUrls('${escapeHtml(relicId)}')">Copy all URLs</button>
-      </div>
-      <div class="photo-grid">
-        ${photos.map((p, i) => `
-          <a class="photo-tile-link" href="${escapeHtml(p.signed_url || '')}" target="_blank" rel="noopener" download="photo-${(i+1).toString().padStart(2,'0')}.jpg" title="Click to open + download photo ${i+1}">
-            <div class="photo-tile-num-card">
-              <div class="big-num">${i+1}</div>
-              <div class="dl-text">DOWNLOAD</div>
-            </div>
-          </a>
-        `).join('')}
-      </div>
-    `;
-  } catch (e) {
-    container.innerHTML = `<div class="muted tiny" style="color: var(--danger); margin-top:10px;">Failed: ${escapeHtml(e.message)}</div>`;
-  }
+  container.innerHTML = `
+    <div style="background:#FFF4E0;border:1px solid var(--accent);border-radius:6px;padding:10px 12px;margin:10px 0;font-size:12px;color:var(--text);">
+      <strong>Photo download URLs aren't available on this page.</strong>
+      Generating signed URLs for the print partner requires the Supabase service role, which can't run from a browser using the anon key.
+      Open this order in the Cowork artifact (which has access to the <code>relic-fulfillment-data</code> edge function) to load printable photos for relic <code>${escapeHtml(relicId)}</code>.
+    </div>`;
 }
 
-window.copyAllPhotoUrls = function(relicId) {
-  const cache = photoCache[relicId];
-  if (!cache) { showToast('Load photos first.'); return; }
-  const urls = cache.photos.map((p, i) => `${(i+1).toString().padStart(2,'0')}: ${p.signed_url || ''}`).join('\n');
-  copyToClipboard(urls);
-};
-
-window.downloadAllPhotos = async function(relicId) {
-  const cache = photoCache[relicId];
-  if (!cache) { showToast('Load photos first.'); return; }
-  showToast(`Triggering ${cache.photos.length} downloads…`);
-  for (let i = 0; i < cache.photos.length; i++) {
-    const p = cache.photos[i];
-    if (!p.signed_url) continue;
-    const a = document.createElement('a');
-    a.href = p.signed_url;
-    a.download = `photo-${(i+1).toString().padStart(2,'0')}.jpg`;
-    a.target = '_blank';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    await new Promise(r => setTimeout(r, 400));
-  }
-  showToast('All download triggers fired.');
-};
-
-// Filter button bindings
 document.querySelectorAll('.filter-btn').forEach(btn => {
+  if (!btn.dataset.filter) return;
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.filter-btn').forEach(b => {
+      if (b.dataset.filter) b.classList.remove('active');
+    });
     btn.classList.add('active');
     currentFilter = btn.dataset.filter;
     renderOrders();
   });
 });
 
-// Initial load
+document.getElementById('reloadBtn').addEventListener('click', () => loadAllRelics());
+
 loadAllRelics();
 </script>
 
