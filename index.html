@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<script type="application/json" id="cowork-artifact-meta">
+{
+  "name": "Relic Fulfillment Dashboard",
+  "schemaVersion": 1,
+  "description": "Phase 1 internal fulfillment dashboard for Maurizio + Liza. Reads live from arkive_relics + capsules + accounts via Supabase MCP. Walks each Relic order through six phases: order info → photos for print partner (signed download URLs via relic-fulfillment-data edge function) → letter for print partner → NFC URL (copy-paste into NFC Tools / TagWriter) → seal → ship + track. Per-phase timestamp updates write directly to arkive_relics. Notes textarea saves on blur.",
+  "mcpTools": [
+    "mcp__90a60bc2-15f7-4b75-9a8b-4436496f5446__execute_sql"
+  ],
+  "mcpServerNames": [
+    "Supabase"
+  ]
+}
+</script>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arkive — Relic Fulfillment</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg: #FAFAFA;
+  --card: #FFFFFF;
+  --border: rgba(0,0,0,0.08);
+  --border-strong: rgba(0,0,0,0.16);
+  --text: #1C1A18;
+  --text-muted: #6C665F;
+  --accent: #C9A870;
+  --accent-soft: rgba(201,168,112,0.12);
+  --success: #4A8B5C;
+  --pending: #B8A06A;
+  --danger: #B05848;
+  --serif: Georgia, 'Times New Roman', serif;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.container { max-width: 1100px; margin: 0 auto; padding: 24px 20px 80px; }
+.page-header { margin-bottom: 24px; }
+.page-title { font-family: var(--serif); font-size: 28px; font-weight: 500; margin: 0 0 4px; }
+.page-sub { color: var(--text-muted); font-size: 13px; margin: 0; }
+.toolbar { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; align-items: center; }
+.filter-btn {
+  padding: 6px 14px; border: 1px solid var(--border); background: var(--card);
+  border-radius: 6px; cursor: pointer; font-size: 12px; color: var(--text-muted);
+  letter-spacing: 0.5px; text-transform: uppercase; transition: all 0.15s;
+}
+.filter-btn:hover { border-color: var(--accent); color: var(--text); }
+.filter-btn.active { background: var(--accent); border-color: var(--accent); color: #1C1A18; font-weight: 600; }
+.summary-row { display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+.stat-pill {
+  background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 8px 14px; font-size: 12px; color: var(--text-muted);
+}
+.stat-pill strong { color: var(--text); font-size: 14px; margin-right: 6px; }
+#status { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; min-height: 18px; }
+#status.error { color: var(--danger); }
+.loading-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(250,250,250,0.85); display: flex; align-items: center;
+  justify-content: center; z-index: 100;
+}
+.spinner {
+  width: 40px; height: 40px; border: 3px solid var(--accent-soft);
+  border-top-color: var(--accent); border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 0; margin-bottom: 16px; overflow: hidden;
+}
+.card-head {
+  padding: 18px 22px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  border-bottom: 1px solid var(--border);
+}
+.order-ref {
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 13px; color: var(--accent); letter-spacing: 0.8px; font-weight: 600;
+}
+.capsule-title {
+  font-family: var(--serif); font-size: 20px; font-weight: 500; flex: 1;
+  margin: 0; min-width: 200px;
+}
+.head-meta { font-size: 12px; color: var(--text-muted); }
+.status-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 10px; border-radius: 999px; font-size: 11px;
+  letter-spacing: 1px; text-transform: uppercase; font-weight: 600;
+  border: 1px solid var(--border);
+}
+.chip-processing { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
+.chip-shipped { background: rgba(74,139,92,0.12); color: var(--success); border-color: var(--success); }
+.chip-delivered { background: rgba(74,139,92,0.18); color: var(--success); border-color: var(--success); }
+.phase-strip { display: grid; grid-template-columns: repeat(6, 1fr); border-bottom: 1px solid var(--border); }
+.phase-cell {
+  padding: 14px 8px; text-align: center; border-right: 1px solid var(--border);
+  font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted);
+  position: relative;
+}
+.phase-cell:last-child { border-right: 0; }
+.phase-cell .marker {
+  display: block; width: 10px; height: 10px; border-radius: 50%;
+  background: #DDD; margin: 0 auto 6px;
+}
+.phase-cell.done .marker { background: var(--success); }
+.phase-cell.done { color: var(--success); }
+.phase-cell .ts { display: block; font-size: 10px; color: var(--text-muted); margin-top: 2px; font-family: ui-monospace, monospace; letter-spacing: 0; text-transform: none; }
+.card-body { padding: 18px 22px; }
+.section { padding: 14px 0; border-bottom: 1px dashed var(--border); }
+.section:last-child { border-bottom: 0; padding-bottom: 0; }
+.section-head {
+  font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 600;
+  color: var(--text-muted); margin-bottom: 10px;
+}
+.kv { display: grid; grid-template-columns: 160px 1fr; gap: 6px 14px; font-size: 13px; }
+.kv .k { color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; padding-top: 1px; }
+.kv .v { color: var(--text); }
+.address-block { white-space: pre-line; font-size: 13px; color: var(--text); }
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 14px; border: 1px solid var(--border); background: var(--card);
+  border-radius: 6px; cursor: pointer; font-size: 12px;
+  letter-spacing: 0.5px; text-transform: uppercase; font-weight: 600;
+  color: var(--text); transition: all 0.15s;
+}
+.btn:hover { border-color: var(--accent); }
+.btn-accent {
+  background: var(--accent); color: #1C1A18; border-color: var(--accent);
+}
+.btn-accent:hover { background: #B89860; border-color: #B89860; }
+.btn-success {
+  background: var(--success); color: white; border-color: var(--success);
+}
+.btn[disabled] { opacity: 0.5; cursor: not-allowed; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+.url-display {
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 12px; padding: 10px 12px; background: #F4F2EE;
+  border: 1px solid var(--border); border-radius: 6px;
+  word-break: break-all; user-select: all; color: var(--text);
+}
+.letter-preview {
+  font-family: var(--serif); font-size: 14px; line-height: 1.7;
+  background: #FBF8F1; border: 1px solid var(--border); border-radius: 6px;
+  padding: 18px 20px; white-space: pre-wrap; color: var(--text);
+}
+.letter-title { font-weight: 600; font-size: 16px; margin-bottom: 12px; font-style: italic; }
+.photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; margin-top: 8px; }
+.photo-tile-link {
+  display: block; text-decoration: none; aspect-ratio: 1/1;
+}
+.photo-tile-num-card {
+  height: 100%; width: 100%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #FBF8F1 0%, #F4F2EE 100%);
+  border: 1px solid var(--border); border-radius: 8px;
+  transition: all 0.15s; cursor: pointer;
+}
+.photo-tile-link:hover .photo-tile-num-card {
+  border-color: var(--accent); background: linear-gradient(135deg, #FFF4E0 0%, #F4F2EE 100%);
+  transform: translateY(-1px);
+}
+.photo-tile-num-card .big-num {
+  font-family: var(--serif); font-size: 32px; font-weight: 500;
+  color: var(--text); line-height: 1;
+}
+.photo-tile-num-card .dl-text {
+  font-size: 9px; letter-spacing: 1.5px; color: var(--accent);
+  font-weight: 700; margin-top: 8px;
+}
+.notes-area {
+  width: 100%; min-height: 60px; padding: 10px 12px; border: 1px solid var(--border);
+  border-radius: 6px; font-family: inherit; font-size: 13px; resize: vertical;
+  background: var(--card);
+}
+.notes-area:focus { outline: none; border-color: var(--accent); }
+.input-text {
+  padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px;
+  font-size: 13px; font-family: inherit; min-width: 220px;
+}
+.input-text:focus { outline: none; border-color: var(--accent); }
+details summary {
+  cursor: pointer; padding: 6px 0; user-select: none;
+  font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted);
+}
+details[open] summary { color: var(--text); }
+.empty {
+  text-align: center; padding: 60px 20px; color: var(--text-muted);
+  font-family: var(--serif); font-size: 16px; font-style: italic;
+}
+.toast {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  background: var(--text); color: white; padding: 10px 18px; border-radius: 6px;
+  font-size: 13px; opacity: 0; transition: opacity 0.2s; pointer-events: none;
+  z-index: 200;
+}
+.toast.show { opacity: 1; }
+.muted { color: var(--text-muted); }
+.tiny { font-size: 11px; }
+@media (max-width: 700px) {
+  .phase-strip { grid-template-columns: repeat(3, 1fr); }
+  .phase-cell:nth-child(3) { border-right: 0; }
+  .phase-cell:nth-child(4), .phase-cell:nth-child(5), .phase-cell:nth-child(6) { border-top: 1px solid var(--border); }
+  .phase-cell:nth-child(6) { border-right: 0; }
+  .kv { grid-template-columns: 1fr; gap: 2px 0; }
+  .kv .k { padding-top: 8px; }
+}
+</style>
+</head>
+<body>
+
+<div id="loadingOverlay" class="loading-overlay">
+  <div class="spinner"></div>
+</div>
+
+<div class="container">
+  <header class="page-header">
+    <h1 class="page-title">Relic Fulfillment</h1>
+    <p class="page-sub">Walk each order through the six fulfillment phases. Status updates write directly to <code>arkive_relics</code>. Use the Reload button in the artifact header to refresh.</p>
+    <div class="toolbar">
+      <button class="filter-btn active" data-filter="active">Active orders</button>
+      <button class="filter-btn" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="shipped">Shipped + delivered</button>
+    </div>
+    <div class="summary-row" id="summaryRow"></div>
+  </header>
+
+  <div id="status"></div>
+  <div id="orders"></div>
+  <div id="debugPanel" style="margin-top:24px;"></div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+const PROJECT_ID = 'skrwdjxgvryodsxusqia';
+const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrcndkanhndnJ5b2RzeHVzcWlhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNzIxMjMsImV4cCI6MjA4OTk0ODEyM30.pmgv9jxIxwcKnJxq3Rz302zJQkAFccKqOa_g6SWFX0Q';
+const FN_URL = `https://${PROJECT_ID}.supabase.co/functions/v1/relic-fulfillment-data`;
+const SQL_TOOL = 'mcp__90a60bc2-15f7-4b75-9a8b-4436496f5446__execute_sql';
+
+let allRelics = [];
+let photoCache = {}; // relic_id -> { photos: [...], letters: [...], expires_at }
+let currentFilter = 'active';
+
+function setStatus(msg, isError) {
+  const el = document.getElementById('status');
+  el.textContent = msg || '';
+  el.className = isError ? 'error' : '';
+}
+
+function renderDebugPanel() {
+  const el = document.getElementById('debugPanel');
+  if (!el) return;
+  if (!_lastRawResponse) { el.innerHTML = ''; return; }
+  let preview = '';
+  try {
+    if (typeof _lastRawResponse === 'string') {
+      preview = _lastRawResponse.slice(0, 4000);
+    } else {
+      preview = JSON.stringify(_lastRawResponse, null, 2).slice(0, 6000);
+    }
+  } catch (e) { preview = '[unstringifiable: ' + e.message + ']'; }
+  const keys = (_lastRawResponse && typeof _lastRawResponse === 'object' && !Array.isArray(_lastRawResponse))
+    ? Object.keys(_lastRawResponse).join(', ')
+    : '(not an object)';
+  el.innerHTML = `
+    <details style="background:#FBF8F1;border:1px solid var(--border);border-radius:8px;padding:12px 16px;">
+      <summary style="cursor:pointer;font-weight:600;color:var(--text);">▸ Debug — last MCP response shape (click to expand)</summary>
+      <div style="margin-top:10px;font-size:12px;color:var(--text-muted);">
+        <div><strong>Type:</strong> ${typeof _lastRawResponse} ${Array.isArray(_lastRawResponse) ? '(Array, length '+_lastRawResponse.length+')' : ''}</div>
+        <div><strong>Top-level keys:</strong> ${escapeHtml(keys)}</div>
+        <div><strong>Loaded rows:</strong> ${allRelics.length}</div>
+        <pre style="background:#FFFFFF;border:1px solid var(--border);border-radius:6px;padding:10px;font-size:11px;line-height:1.5;overflow:auto;max-height:400px;margin-top:10px;white-space:pre-wrap;word-break:break-all;">${escapeHtml(preview)}${preview.length >= 4000 ? '\n…(truncated)' : ''}</pre>
+      </div>
+    </details>
+  `;
+}
+
+function showLoading(show) {
+  document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+function escapeSql(s) { return String(s == null ? '' : s).replace(/'/g, "''"); }
+function escapeHtml(s) {
+  if (s == null) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// Robust SQL runner. Always returns an Array of row objects.
+// Stores last raw response globally so we can render an inline debug view.
+let _lastRawResponse = null;
+function _coerceToRows(value) {
+  // Already an array
+  if (Array.isArray(value)) return value;
+  // Object — dig for common row-array keys
+  if (value && typeof value === 'object') {
+    for (const key of ['rows', 'data', 'records', 'results', 'result']) {
+      const v = value[key];
+      if (Array.isArray(v)) return v;
+      if (v && typeof v === 'object' && !Array.isArray(v)) {
+        const nested = _coerceToRows(v);
+        if (Array.isArray(nested)) return nested;
+      }
+    }
+    // Do NOT wrap a non-row object as [object] — that creates phantom rows.
+    // If we can't find an array, we genuinely have no rows.
+  }
+  return null; // null = "couldn't extract", caller decides what to do
+}
+// Recursive row extractor. Accepts any value (object, string, array) and digs
+// through MCP envelopes, JSON-stringified payloads, Supabase {result:"..."}
+// wrappers, and <untrusted-data-XXX>...</untrusted-data-XXX> bounded blocks.
+// Returns the first Array it finds, or null if none.
+function _extractRows(value, depth) {
+  if (depth == null) depth = 0;
+  if (depth > 6) return null; // recursion guard
+  if (value == null) return null;
+  // Direct array
+  if (Array.isArray(value)) return value;
+  // String: try multiple parse paths, then recurse on the parsed value
+  if (typeof value === 'string') {
+    // Try <untrusted-data-XYZ>JSON</untrusted-data-XYZ> first (longest match for embedded brackets)
+    const wrapped = value.match(/<untrusted-data-[\w-]+>\s*([\s\S]*?)\s*<\/untrusted-data-[\w-]+>/);
+    if (wrapped) {
+      try {
+        const parsed = JSON.parse(wrapped[1]);
+        const r = _extractRows(parsed, depth + 1);
+        if (Array.isArray(r)) return r;
+      } catch (e) { /* fall through */ }
+    }
+    // Try the whole string as JSON
+    try {
+      const parsed = JSON.parse(value);
+      const r = _extractRows(parsed, depth + 1);
+      if (Array.isArray(r)) return r;
+    } catch (e) { /* fall through */ }
+    // Try greedy top-level array regex
+    const arrMatch = value.match(/\[[\s\S]*\]/);
+    if (arrMatch) {
+      try {
+        const parsed = JSON.parse(arrMatch[0]);
+        if (Array.isArray(parsed)) return parsed;
+      } catch (e) { /* fall through */ }
+    }
+    return null;
+  }
+  // Object: walk MCP-standard envelope keys and Supabase wrapper keys
+  if (typeof value === 'object') {
+    // MCP standard: { content: [{ type, text }] }
+    if (Array.isArray(value.content)) {
+      for (const c of value.content) {
+        if (c && typeof c.text === 'string') {
+          const r = _extractRows(c.text, depth + 1);
+          if (Array.isArray(r)) return r;
+        }
+      }
+    }
+    // Supabase wrapper / generic row containers
+    for (const key of ['rows', 'data', 'records', 'results', 'result']) {
+      if (value[key] != null) {
+        const r = _extractRows(value[key], depth + 1);
+        if (Array.isArray(r)) return r;
+      }
+    }
+    // Fallthrough properties to consider
+    if (typeof value.text === 'string') {
+      const r = _extractRows(value.text, depth + 1);
+      if (Array.isArray(r)) return r;
+    }
+    return null;
+  }
+  return null;
+}
+
+async function runSql(query) {
+  const raw = await window.cowork.callMcpTool(SQL_TOOL, {
+    project_id: PROJECT_ID,
+    query: query
+  });
+  _lastRawResponse = raw;
+  if (raw && typeof raw === 'object' && raw.isError) {
+    const errMsg = raw?.content?.[0]?.text || JSON.stringify(raw);
+    throw new Error('SQL error: ' + errMsg);
+  }
+  if (raw && typeof raw === 'object' && raw.error) {
+    throw new Error('SQL error: ' + (raw.error?.message || JSON.stringify(raw.error)));
+  }
+  const rows = _extractRows(raw);
+  if (Array.isArray(rows)) return rows;
+  console.error('[runSql] Could not extract row array. Raw:', raw);
+  throw new Error('Could not parse SQL response. See debug panel below.');
+}
+
+async function fireEdgeFunction(body) {
+  // Step 1: fire request
+  const fireSql = `SELECT net.http_post(
+    url := '${FN_URL}',
+    headers := '{"Authorization": "Bearer ${ANON_KEY}", "Content-Type": "application/json"}'::jsonb,
+    body := '${escapeSql(JSON.stringify(body))}'::jsonb
+  ) AS request_id;`;
+  const fireResult = await runSql(fireSql);
+  const requestId = fireResult?.[0]?.request_id;
+  if (!requestId) throw new Error('Failed to fire edge function: no request id');
+
+  // Step 2: poll for response (up to 25s, 1s intervals)
+  for (let i = 0; i < 25; i++) {
+    await new Promise(r => setTimeout(r, 1000));
+    const pollResult = await runSql(`SELECT status_code, content::text AS content FROM net._http_response WHERE id = ${requestId} LIMIT 1;`);
+    const row = pollResult?.[0];
+    if (row && row.status_code) {
+      try { return JSON.parse(row.content); }
+      catch (e) { throw new Error('Bad response from edge function: ' + row.content?.slice(0, 200)); }
+    }
+  }
+  throw new Error('Edge function timed out after 25s');
+}
+
+async function loadAllRelics() {
+  showLoading(true);
+  setStatus('Loading orders…');
+  try {
+    // Pull every relic + purchaser + capsule letters via SQL (fast).
+    // Filters chosen letter via letter_id; we pass selected_photo_ids through
+    // for the photo loader to filter against.
+    const query = `
+      SELECT
+        r.id, r.creator_user_id, r.capsule_id, r.order_status, r.ordered_at, r.price, r.currency,
+        r.recipient_name, r.capsule_title, r.photo_count, r.has_letter,
+        r.shipping_recipient_full_name, r.shipping_street, r.shipping_city,
+        r.shipping_postal_code, r.shipping_country, r.shipping_phone,
+        r.tracking_number, r.shipped_at, r.delivered_at, r.nfc_deep_link,
+        r.confirmation_email_sent_at, r.delivery_date,
+        r.photos_printed_at, r.letter_printed_at, r.nfc_encoded_at, r.sealed_at,
+        r.fulfillment_notes, r.letter_content_snapshot, r.letter_id, r.selected_photo_ids,
+        a.email AS purchaser_email, a.display_name AS purchaser_name,
+        c.title AS capsule_full_title,
+        -- Filtered letter: only the one matching r.letter_id (if set), else null
+        (SELECT to_jsonb(jsonb_build_object('id', e->>'id', 'title', e->>'title', 'body', e->>'subtitle', 'sort_index', (e->>'sort_index')::int))
+         FROM jsonb_array_elements(c.items_json) e
+         WHERE e->>'kind' = 'Letter' AND e->>'id' = r.letter_id::text
+         LIMIT 1) AS chosen_letter
+      FROM arkive_relics r
+      LEFT JOIN accounts a ON a.id = r.creator_user_id
+      LEFT JOIN capsules c ON c.id = r.capsule_id
+      ORDER BY r.ordered_at DESC;
+    `;
+    const rows = await runSql(query);
+    if (!Array.isArray(rows)) {
+      console.error('[loadAllRelics] runSql returned non-array:', rows);
+      allRelics = [];
+      throw new Error('Query returned non-array result. See console.');
+    }
+    allRelics = rows;
+    renderSummary();
+    renderOrders();
+    setStatus(`Loaded ${allRelics.length} order${allRelics.length === 1 ? '' : 's'}.`);
+    renderDebugPanel();
+  } catch (e) {
+    setStatus('Failed to load: ' + e.message, true);
+    renderDebugPanel();
+  } finally {
+    showLoading(false);
+  }
+}
+
+function renderSummary() {
+  const sumRow = document.getElementById('summaryRow');
+  const total = allRelics.length;
+  const active = allRelics.filter(r => !r.delivered_at).length;
+  const inProcessing = allRelics.filter(r => !r.shipped_at).length;
+  const shipped = allRelics.filter(r => r.shipped_at && !r.delivered_at).length;
+  const delivered = allRelics.filter(r => r.delivered_at).length;
+  sumRow.innerHTML = `
+    <div class="stat-pill"><strong>${total}</strong> total</div>
+    <div class="stat-pill"><strong>${inProcessing}</strong> in production</div>
+    <div class="stat-pill"><strong>${shipped}</strong> shipped</div>
+    <div class="stat-pill"><strong>${delivered}</strong> delivered</div>
+  `;
+}
+
+function renderOrders() {
+  const container = document.getElementById('orders');
+  let filtered;
+  if (currentFilter === 'active') filtered = allRelics.filter(r => !r.delivered_at);
+  else if (currentFilter === 'shipped') filtered = allRelics.filter(r => r.shipped_at);
+  else filtered = allRelics;
+
+  if (filtered.length === 0) {
+    container.innerHTML = `<div class="empty">No orders match this filter.</div>`;
+    return;
+  }
+  container.innerHTML = filtered.map(renderCard).join('');
+  bindCardEvents();
+}
+
+function formatOrderRef(uuid) {
+  const seg = (uuid || '').replace(/-/g, '').slice(0, 8).toUpperCase();
+  return `${seg.slice(0,4)}-${seg.slice(4,8)}`;
+}
+
+function fmtDate(s) {
+  if (!s) return '—';
+  const d = new Date(s);
+  return d.toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' });
+}
+
+function fmtDateTime(s) {
+  if (!s) return '—';
+  const d = new Date(s);
+  return d.toLocaleString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+}
+
+function fmtPrice(p, c) {
+  const n = parseFloat(p || 0);
+  const sym = c === 'EUR' ? '€' : c === 'USD' ? '$' : (c + ' ');
+  return sym + n.toFixed(2);
+}
+
+function statusChip(r) {
+  if (r.delivered_at) return `<span class="status-chip chip-delivered">Delivered</span>`;
+  if (r.shipped_at) return `<span class="status-chip chip-shipped">Shipped</span>`;
+  return `<span class="status-chip chip-processing">${escapeHtml(r.order_status || 'Processing')}</span>`;
+}
+
+function phaseStrip(r) {
+  const phases = [
+    { label: 'Photos printed', ts: r.photos_printed_at, applicable: true },
+    { label: r.has_letter ? 'Letter printed' : 'Letter (n/a)', ts: r.letter_printed_at, applicable: !!r.has_letter },
+    { label: 'NFC encoded', ts: r.nfc_encoded_at, applicable: true },
+    { label: 'Sealed', ts: r.sealed_at, applicable: true },
+    { label: 'Shipped', ts: r.shipped_at, applicable: true },
+    { label: 'Delivered', ts: r.delivered_at, applicable: true },
+  ];
+  return `<div class="phase-strip">${phases.map(p => `
+    <div class="phase-cell ${p.ts ? 'done' : ''} ${!p.applicable ? 'na' : ''}">
+      <span class="marker"></span>
+      ${escapeHtml(p.label)}
+      <span class="ts">${p.ts ? fmtDate(p.ts) : (!p.applicable ? '—' : 'pending')}</span>
+    </div>
+  `).join('')}</div>`;
+}
+
+function renderCard(r) {
+  const orderRef = formatOrderRef(r.id);
+  // Letter resolution: chosen_letter from capsule (filtered by letter_id) → snapshot fallback
+  const chosenLetter = r.chosen_letter || (r.letter_content_snapshot ? { id:'snapshot', title:'(from order-time snapshot)', body: r.letter_content_snapshot, sort_index: 0 } : null);
+  const letterSource = r.chosen_letter ? 'capsule' : (r.letter_content_snapshot ? 'snapshot' : 'none');
+  // Photo selection state
+  const selectedPhotoIds = Array.isArray(r.selected_photo_ids) ? r.selected_photo_ids : null;
+  const selectionUnknown = !selectedPhotoIds || selectedPhotoIds.length === 0;
+  const giftRecipient = r.shipping_recipient_full_name || r.recipient_name || '—';
+  const address = [
+    r.shipping_street,
+    [r.shipping_postal_code, r.shipping_city].filter(Boolean).join(' '),
+    r.shipping_country
+  ].filter(Boolean).join('\n');
+
+  return `
+  <div class="card" data-id="${escapeHtml(r.id)}">
+    <div class="card-head">
+      <div>
+        <div class="order-ref">${orderRef}</div>
+        <div class="head-meta">Ordered ${fmtDate(r.ordered_at)} · ${fmtPrice(r.price, r.currency)}</div>
+      </div>
+      <h2 class="capsule-title">${escapeHtml(r.capsule_title || 'Untitled capsule')}</h2>
+      ${statusChip(r)}
+    </div>
+
+    ${phaseStrip(r)}
+
+    <div class="card-body">
+
+      <div class="section">
+        <div class="section-head">Order info</div>
+        <div class="kv">
+          <div class="k">Purchaser</div>
+          <div class="v">${escapeHtml(r.purchaser_name || '')} <span class="muted">&lt;${escapeHtml(r.purchaser_email || '')}&gt;</span></div>
+          <div class="k">Gift recipient</div>
+          <div class="v">${escapeHtml(giftRecipient)}</div>
+          <div class="k">Shipping</div>
+          <div class="v address-block">${escapeHtml(address)}</div>
+          <div class="k">Phone</div>
+          <div class="v">${escapeHtml(r.shipping_phone || '—')}</div>
+          <div class="k">Photos / Letter</div>
+          <div class="v">${r.photo_count} photo${r.photo_count === 1 ? '' : 's'}${r.has_letter ? ' + letter' : ' (no letter)'}</div>
+          <div class="k">Confirmation email</div>
+          <div class="v">${r.confirmation_email_sent_at ? '✓ sent ' + fmtDateTime(r.confirmation_email_sent_at) : '<span class="muted">not sent yet</span>'}</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-head">Phase 2 — Photos for print partner</div>
+        ${r.photos_printed_at
+          ? `<div class="muted">✓ Marked printed ${fmtDate(r.photos_printed_at)}</div>`
+          : `<div class="actions" id="photo-actions-${escapeHtml(r.id)}">
+              <button class="btn" data-action="load-photos" data-id="${escapeHtml(r.id)}">Load photo URLs</button>
+              <button class="btn btn-success" data-action="mark" data-field="photos_printed_at" data-id="${escapeHtml(r.id)}">Mark photos printed</button>
+            </div>
+            <div id="photos-${escapeHtml(r.id)}"></div>`
+        }
+      </div>
+
+      ${r.has_letter ? `
+      <div class="section">
+        <div class="section-head">Phase 3 — Letter for print partner ${letterSource === 'snapshot' ? '<span class="tiny muted">(from snapshot)</span>' : ''}</div>
+        ${chosenLetter
+          ? `<div class="letter-preview"><div class="letter-title">${escapeHtml(chosenLetter.title || 'Untitled letter')}</div>${escapeHtml(chosenLetter.body || '')}</div>`
+          : `<div class="muted tiny">No letter content found. letter_id=${escapeHtml(r.letter_id || 'null')}, capsule had no matching item, no snapshot available.</div>`
+        }
+        ${r.letter_printed_at
+          ? `<div class="muted" style="margin-top:10px;">✓ Marked printed ${fmtDate(r.letter_printed_at)}</div>`
+          : `<div class="actions">
+              <button class="btn btn-success" data-action="mark" data-field="letter_printed_at" data-id="${escapeHtml(r.id)}">Mark letter printed</button>
+              <button class="btn" data-action="copy-letter" data-id="${escapeHtml(r.id)}">Copy letter text</button>
+            </div>`
+        }
+      </div>
+      ` : ''}
+
+      <div class="section">
+        <div class="section-head">Phase 4 — NFC card</div>
+        <div class="muted tiny" style="margin-bottom:6px;">Copy this URL into NFC Tools / TagWriter on your phone, write to a blank NFC card, then mark encoded.</div>
+        <div class="url-display">${escapeHtml(r.nfc_deep_link || '')}</div>
+        ${r.nfc_encoded_at
+          ? `<div class="muted" style="margin-top:10px;">✓ Marked encoded ${fmtDate(r.nfc_encoded_at)}</div>`
+          : `<div class="actions">
+              <button class="btn" data-action="copy-nfc" data-id="${escapeHtml(r.id)}">Copy URL</button>
+              <button class="btn btn-success" data-action="mark" data-field="nfc_encoded_at" data-id="${escapeHtml(r.id)}">Mark NFC encoded</button>
+            </div>`
+        }
+      </div>
+
+      <div class="section">
+        <div class="section-head">Phase 5 — Seal &amp; assemble</div>
+        ${r.sealed_at
+          ? `<div class="muted">✓ Marked sealed ${fmtDate(r.sealed_at)}</div>`
+          : `<div class="actions">
+              <button class="btn btn-success" data-action="mark" data-field="sealed_at" data-id="${escapeHtml(r.id)}">Mark sealed</button>
+            </div>`
+        }
+      </div>
+
+      <div class="section">
+        <div class="section-head">Phase 6 — Ship &amp; track</div>
+        ${r.shipped_at ? `
+          <div class="kv">
+            <div class="k">Shipped</div>
+            <div class="v">${fmtDate(r.shipped_at)}</div>
+            <div class="k">Tracking #</div>
+            <div class="v">${escapeHtml(r.tracking_number || '—')}</div>
+            <div class="k">Delivered</div>
+            <div class="v">${r.delivered_at ? '✓ ' + fmtDate(r.delivered_at) : 'not yet'}</div>
+          </div>
+          ${!r.delivered_at ? `<div class="actions"><button class="btn btn-success" data-action="mark" data-field="delivered_at" data-id="${escapeHtml(r.id)}">Mark delivered</button></div>` : ''}
+        ` : `
+          <div class="actions" style="align-items:center;">
+            <input type="text" class="input-text" placeholder="Tracking #" id="tracking-${escapeHtml(r.id)}" />
+            <button class="btn btn-success" data-action="ship" data-id="${escapeHtml(r.id)}">Mark shipped</button>
+          </div>
+        `}
+      </div>
+
+      <div class="section">
+        <div class="section-head">Notes</div>
+        <textarea class="notes-area" data-action="notes" data-id="${escapeHtml(r.id)}" placeholder="Free-form notes for the team (reprints, NFC retries, partner-side issues, etc.)">${escapeHtml(r.fulfillment_notes || '')}</textarea>
+      </div>
+
+    </div>
+  </div>`;
+}
+
+function bindCardEvents() {
+  // Action buttons
+  document.querySelectorAll('[data-action="mark"]').forEach(btn => {
+    btn.addEventListener('click', () => markPhase(btn.dataset.id, btn.dataset.field));
+  });
+  document.querySelectorAll('[data-action="ship"]').forEach(btn => {
+    btn.addEventListener('click', () => markShipped(btn.dataset.id));
+  });
+  document.querySelectorAll('[data-action="load-photos"]').forEach(btn => {
+    btn.addEventListener('click', () => loadPhotos(btn.dataset.id));
+  });
+  document.querySelectorAll('[data-action="copy-nfc"]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const r = allRelics.find(x => x.id === btn.dataset.id);
+      copyToClipboard(r?.nfc_deep_link || '');
+    });
+  });
+  document.querySelectorAll('[data-action="copy-letter"]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const r = allRelics.find(x => x.id === btn.dataset.id);
+      const chosen = r?.chosen_letter || (r?.letter_content_snapshot ? { title:'', body:r.letter_content_snapshot } : null);
+      if (!chosen) { showToast('No letter content to copy'); return; }
+      copyToClipboard((chosen.title ? chosen.title + '\n\n' : '') + (chosen.body || ''));
+    });
+  });
+  // Notes textarea (debounced save on blur)
+  document.querySelectorAll('[data-action="notes"]').forEach(ta => {
+    ta.addEventListener('blur', () => saveNotes(ta.dataset.id, ta.value));
+  });
+}
+
+function copyToClipboard(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard'));
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); showToast('Copied to clipboard'); }
+    catch (e) { showToast('Copy failed'); }
+    document.body.removeChild(ta);
+  }
+}
+
+async function markPhase(relicId, field) {
+  showLoading(true);
+  setStatus(`Marking ${field}…`);
+  try {
+    await runSql(`UPDATE arkive_relics SET ${field} = NOW(), updated_at = NOW() WHERE id = '${escapeSql(relicId)}'::uuid;`);
+    // Refresh
+    await loadAllRelics();
+    showToast('Updated');
+  } catch (e) {
+    setStatus('Update failed: ' + e.message, true);
+    showLoading(false);
+  }
+}
+
+async function markShipped(relicId) {
+  const trackingInput = document.getElementById(`tracking-${relicId}`);
+  const tracking = (trackingInput?.value || '').trim();
+  if (!tracking) {
+    setStatus('Enter a tracking number first.', true);
+    return;
+  }
+  showLoading(true);
+  setStatus('Marking shipped…');
+  try {
+    await runSql(`
+      UPDATE arkive_relics
+      SET shipped_at = NOW(),
+          tracking_number = '${escapeSql(tracking)}',
+          order_status = 'Shipped',
+          updated_at = NOW()
+      WHERE id = '${escapeSql(relicId)}'::uuid;
+    `);
+    await loadAllRelics();
+    showToast('Shipped');
+  } catch (e) {
+    setStatus('Update failed: ' + e.message, true);
+    showLoading(false);
+  }
+}
+
+async function saveNotes(relicId, value) {
+  try {
+    await runSql(`UPDATE arkive_relics SET fulfillment_notes = '${escapeSql(value)}', updated_at = NOW() WHERE id = '${escapeSql(relicId)}'::uuid;`);
+    showToast('Notes saved');
+  } catch (e) {
+    setStatus('Notes save failed: ' + e.message, true);
+  }
+}
+
+async function loadPhotos(relicId) {
+  const container = document.getElementById(`photos-${relicId}`);
+  if (!container) return;
+  const relicRow = allRelics.find(r => r.id === relicId);
+  const expectedCount = relicRow?.photo_count || 0;
+  const selectedIds = Array.isArray(relicRow?.selected_photo_ids) ? relicRow.selected_photo_ids : null;
+  container.innerHTML = `<div class="muted tiny" style="margin-top:10px;">Generating signed download URLs… (5–10s)</div>`;
+  try {
+    const data = await fireEdgeFunction({ relic_id: relicId });
+    const relic = data?.relics?.[0];
+    if (!relic) throw new Error('No data returned');
+    let photos = relic.photos || [];
+    let selectionUnknown = false;
+    let totalInCapsule = photos.length;
+    // Filter to selected_photo_ids if present
+    if (selectedIds && selectedIds.length > 0) {
+      const idSet = new Set(selectedIds);
+      photos = photos.filter(p => idSet.has(p.id));
+    } else {
+      selectionUnknown = true;
+    }
+    if (photos.length === 0) {
+      container.innerHTML = `<div class="muted tiny">No photos found for this order.</div>`;
+      return;
+    }
+    photoCache[relicId] = { photos, expires_at: Date.now() + 3500 * 1000 };
+    const warning = selectionUnknown ? `
+      <div style="background:#FFF4E0;border:1px solid var(--accent);border-radius:6px;padding:10px 12px;margin:10px 0;font-size:12px;color:var(--text);">
+        <strong>⚠ Photo selection not yet stored.</strong>
+        Capsule contains <strong>${totalInCapsule}</strong> photos; customer ordered <strong>${expectedCount}</strong> for printing.
+        The iOS Builder doesn't yet write the customer's specific selection to <code>arkive_relics.selected_photo_ids</code>.
+        Until that PR ships, send <strong>all ${totalInCapsule}</strong> photos to the print partner OR coordinate with the customer to identify the ${expectedCount} they wanted. Reach out to Maurizio to ratify.
+      </div>` : `
+      <div class="muted tiny" style="margin:10px 0 6px;">
+        ✓ Showing ${photos.length} customer-selected photo${photos.length === 1 ? '' : 's'} (filtered from ${totalInCapsule} in capsule). Signed URLs valid 1 hour. Open the artifact in your browser tab to download tiles.
+      </div>`;
+    // Numbered tiles. Cowork sandbox blocks inline <img> network loads, so we
+    // use clean numbered placeholder cards with prominent download links.
+    // Clicking a tile opens the signed URL in a new browser tab where the
+    // browser handles the download outside the sandbox.
+    container.innerHTML = `
+      ${warning}
+      <div class="actions" style="margin-bottom:8px;">
+        <button class="btn btn-accent" onclick="downloadAllPhotos('${escapeHtml(relicId)}')">Download all (sequential)</button>
+        <button class="btn" onclick="copyAllPhotoUrls('${escapeHtml(relicId)}')">Copy all URLs</button>
+      </div>
+      <div class="photo-grid">
+        ${photos.map((p, i) => `
+          <a class="photo-tile-link" href="${escapeHtml(p.signed_url || '')}" target="_blank" rel="noopener" download="photo-${(i+1).toString().padStart(2,'0')}.jpg" title="Click to open + download photo ${i+1}">
+            <div class="photo-tile-num-card">
+              <div class="big-num">${i+1}</div>
+              <div class="dl-text">DOWNLOAD</div>
+            </div>
+          </a>
+        `).join('')}
+      </div>
+    `;
+  } catch (e) {
+    container.innerHTML = `<div class="muted tiny" style="color: var(--danger); margin-top:10px;">Failed: ${escapeHtml(e.message)}</div>`;
+  }
+}
+
+window.copyAllPhotoUrls = function(relicId) {
+  const cache = photoCache[relicId];
+  if (!cache) { showToast('Load photos first.'); return; }
+  const urls = cache.photos.map((p, i) => `${(i+1).toString().padStart(2,'0')}: ${p.signed_url || ''}`).join('\n');
+  copyToClipboard(urls);
+};
+
+window.downloadAllPhotos = async function(relicId) {
+  const cache = photoCache[relicId];
+  if (!cache) { showToast('Load photos first.'); return; }
+  showToast(`Triggering ${cache.photos.length} downloads…`);
+  for (let i = 0; i < cache.photos.length; i++) {
+    const p = cache.photos[i];
+    if (!p.signed_url) continue;
+    const a = document.createElement('a');
+    a.href = p.signed_url;
+    a.download = `photo-${(i+1).toString().padStart(2,'0')}.jpg`;
+    a.target = '_blank';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    await new Promise(r => setTimeout(r, 400));
+  }
+  showToast('All download triggers fired.');
+};
+
+// Filter button bindings
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    renderOrders();
+  });
+});
+
+// Initial load
+loadAllRelics();
+</script>
+
+</body>
+</html>
