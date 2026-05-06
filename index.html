@@ -192,6 +192,52 @@ details[open] summary { color: var(--text); }
 .toast.show { opacity: 1; }
 .muted { color: var(--text-muted); }
 .tiny { font-size: 11px; }
+.login-wrap {
+  max-width: 380px; margin: 80px auto 0; padding: 0 20px;
+}
+.login-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 28px 26px;
+}
+.login-title {
+  font-family: var(--serif); font-size: 24px; font-weight: 500;
+  margin: 0 0 4px;
+}
+.login-sub {
+  color: var(--text-muted); font-size: 13px; margin: 0 0 20px;
+}
+.login-field { margin-bottom: 14px; }
+.login-field label {
+  display: block; font-size: 11px; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--text-muted);
+  margin-bottom: 6px; font-weight: 600;
+}
+.login-input {
+  width: 100%; padding: 10px 12px; border: 1px solid var(--border);
+  border-radius: 6px; font-size: 14px; font-family: inherit;
+  background: var(--card); color: var(--text);
+}
+.login-input:focus { outline: none; border-color: var(--accent); }
+.login-btn {
+  width: 100%; padding: 11px 14px; background: var(--accent); color: #1C1A18;
+  border: 1px solid var(--accent); border-radius: 6px; cursor: pointer;
+  font-size: 12px; letter-spacing: 0.8px; text-transform: uppercase;
+  font-weight: 700; transition: all 0.15s;
+}
+.login-btn:hover { background: #B89860; border-color: #B89860; }
+.login-btn[disabled] { opacity: 0.6; cursor: not-allowed; }
+.login-error {
+  font-size: 13px; color: var(--danger); margin-top: 10px; min-height: 18px;
+}
+.btn-logout {
+  margin-left: 8px; background: var(--card);
+}
+.user-pill {
+  font-size: 11px; color: var(--text-muted);
+  padding: 6px 10px; border-radius: 999px;
+  background: var(--card); border: 1px solid var(--border);
+}
+.user-pill strong { color: var(--text); }
 @media (max-width: 700px) {
   .phase-strip { grid-template-columns: repeat(3, 1fr); }
   .phase-cell:nth-child(3) { border-right: 0; }
@@ -204,11 +250,30 @@ details[open] summary { color: var(--text); }
 </head>
 <body>
 
-<div id="loadingOverlay" class="loading-overlay">
+<div id="loadingOverlay" class="loading-overlay" style="display:none;">
   <div class="spinner"></div>
 </div>
 
-<div class="container">
+<div id="loginWrap" class="login-wrap" style="display:none;">
+  <div class="login-card">
+    <h1 class="login-title">Relic Fulfillment</h1>
+    <p class="login-sub">Sign in to access fulfillment data.</p>
+    <form id="loginForm">
+      <div class="login-field">
+        <label for="loginEmail">Email</label>
+        <input type="email" id="loginEmail" class="login-input" autocomplete="email" value="maurizio@brivioadvisory.com" required>
+      </div>
+      <div class="login-field">
+        <label for="loginPassword">Password</label>
+        <input type="password" id="loginPassword" class="login-input" autocomplete="current-password" required>
+      </div>
+      <button type="submit" id="loginBtn" class="login-btn">Sign in</button>
+      <div id="loginError" class="login-error"></div>
+    </form>
+  </div>
+</div>
+
+<div id="dashboardWrap" class="container" style="display:none;">
   <header class="page-header">
     <h1 class="page-title">Relic Fulfillment</h1>
     <p class="page-sub">Walk each order through the six fulfillment phases. Status updates write directly to <code>arkive_relics</code> via the Supabase REST API. Click Reload to refresh.</p>
@@ -217,6 +282,8 @@ details[open] summary { color: var(--text); }
       <button class="filter-btn" data-filter="all">All</button>
       <button class="filter-btn" data-filter="shipped">Shipped + delivered</button>
       <button class="filter-btn" id="reloadBtn" style="margin-left:auto;">Reload</button>
+      <span class="user-pill" id="userPill"></span>
+      <button class="filter-btn btn-logout" id="logoutBtn">Sign out</button>
     </div>
     <div class="summary-row" id="summaryRow"></div>
   </header>
@@ -231,10 +298,80 @@ details[open] summary { color: var(--text); }
 const SUPABASE_URL = 'https://skrwdjxgvryodsxusqia.supabase.co';
 const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrcndkanhndnJ5b2RzeHVzcWlhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNzIxMjMsImV4cCI6MjA4OTk0ODEyM30.pmgv9jxIxwcKnJxq3Rz302zJQkAFccKqOa_g6SWFX0Q';
 const REST = SUPABASE_URL + '/rest/v1';
-const REST_HEADERS = { apikey: ANON_KEY, Authorization: 'Bearer ' + ANON_KEY };
+const AUTH = SUPABASE_URL + '/auth/v1';
+const SESSION_KEY = 'arkive_fulfillment_session';
 
+let session = null;
 let allRelics = [];
 let currentFilter = 'active';
+
+function authHeaders() {
+  const token = session?.access_token || ANON_KEY;
+  return { apikey: ANON_KEY, Authorization: 'Bearer ' + token };
+}
+
+function loadStoredSession() {
+  try {
+    const raw = localStorage.getItem(SESSION_KEY);
+    if (!raw) return null;
+    const s = JSON.parse(raw);
+    if (s && s.expires_at && (s.expires_at * 1000) < Date.now() + 5000) return null;
+    return s;
+  } catch (e) { return null; }
+}
+
+function storeSession(s) {
+  session = s;
+  localStorage.setItem(SESSION_KEY, JSON.stringify(s));
+}
+
+function clearStoredSession() {
+  session = null;
+  localStorage.removeItem(SESSION_KEY);
+}
+
+async function signIn(email, password) {
+  const res = await fetch(AUTH + '/token?grant_type=password', {
+    method: 'POST',
+    headers: { apikey: ANON_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password })
+  });
+  const text = await res.text();
+  let data;
+  try { data = text ? JSON.parse(text) : {}; } catch (e) { data = { error_description: text }; }
+  if (!res.ok) {
+    throw new Error(data.error_description || data.msg || data.message || `Sign-in failed (${res.status})`);
+  }
+  storeSession(data);
+  return data;
+}
+
+async function signOut() {
+  if (session?.access_token) {
+    try {
+      await fetch(AUTH + '/logout', { method: 'POST', headers: authHeaders() });
+    } catch (e) { /* ignore */ }
+  }
+  clearStoredSession();
+}
+
+function showLogin() {
+  document.getElementById('loginWrap').style.display = 'block';
+  document.getElementById('dashboardWrap').style.display = 'none';
+  document.getElementById('loadingOverlay').style.display = 'none';
+  setTimeout(() => {
+    const pwd = document.getElementById('loginPassword');
+    if (pwd) pwd.focus();
+  }, 50);
+}
+
+function showDashboard() {
+  document.getElementById('loginWrap').style.display = 'none';
+  document.getElementById('dashboardWrap').style.display = 'block';
+  const pill = document.getElementById('userPill');
+  const userEmail = session?.user?.email || '';
+  pill.innerHTML = userEmail ? `Signed in as <strong>${escapeHtml(userEmail)}</strong>` : '';
+}
 
 function setStatus(msg, isError) {
   const el = document.getElementById('status');
@@ -258,8 +395,19 @@ function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
+function handleAuthFailure() {
+  clearStoredSession();
+  showLogin();
+  setStatus('Session expired. Please sign in again.', true);
+  showLoading(false);
+}
+
 async function restGet(path) {
-  const res = await fetch(REST + path, { headers: REST_HEADERS });
+  const res = await fetch(REST + path, { headers: authHeaders() });
+  if (res.status === 401) {
+    handleAuthFailure();
+    throw new Error('Authentication required');
+  }
   if (!res.ok) {
     const body = await res.text();
     throw new Error(`GET ${path} → ${res.status}: ${body.slice(0, 200)}`);
@@ -270,9 +418,13 @@ async function restGet(path) {
 async function restPatch(path, body) {
   const res = await fetch(REST + path, {
     method: 'PATCH',
-    headers: { ...REST_HEADERS, 'Content-Type': 'application/json', Prefer: 'return=representation' },
+    headers: { ...authHeaders(), 'Content-Type': 'application/json', Prefer: 'return=representation' },
     body: JSON.stringify(body)
   });
+  if (res.status === 401) {
+    handleAuthFailure();
+    throw new Error('Authentication required');
+  }
   if (!res.ok) {
     const t = await res.text();
     throw new Error(`PATCH ${path} → ${res.status}: ${t.slice(0, 200)}`);
@@ -663,7 +815,52 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
 
 document.getElementById('reloadBtn').addEventListener('click', () => loadAllRelics());
 
-loadAllRelics();
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  await signOut();
+  allRelics = [];
+  document.getElementById('orders').innerHTML = '';
+  document.getElementById('summaryRow').innerHTML = '';
+  setStatus('');
+  showLogin();
+});
+
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const btn = document.getElementById('loginBtn');
+  const errEl = document.getElementById('loginError');
+  errEl.textContent = '';
+  if (!email || !password) {
+    errEl.textContent = 'Email and password are required.';
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = 'Signing in…';
+  try {
+    await signIn(email, password);
+    document.getElementById('loginPassword').value = '';
+    showDashboard();
+    await loadAllRelics();
+  } catch (err) {
+    errEl.textContent = err.message || 'Sign-in failed.';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Sign in';
+  }
+});
+
+(function boot() {
+  const stored = loadStoredSession();
+  if (stored) {
+    session = stored;
+    showDashboard();
+    loadAllRelics();
+  } else {
+    clearStoredSession();
+    showLogin();
+  }
+})();
 </script>
 
 </body>
