@@ -2,288 +2,797 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#F2EDE6">
 <title>Arkive — Relic Fulfillment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&display=swap" rel="stylesheet">
 <style>
 :root {
   color-scheme: light;
-  --bg: #FAFAFA;
-  --card: #FFFFFF;
-  --border: rgba(0,0,0,0.08);
-  --border-strong: rgba(0,0,0,0.16);
-  --text: #1C1A18;
-  --text-muted: #6C665F;
-  --accent: #C9A870;
-  --accent-soft: rgba(201,168,112,0.12);
-  --success: #4A8B5C;
-  --pending: #B8A06A;
-  --danger: #B05848;
-  --serif: Georgia, 'Times New Roman', serif;
+  --arkive-bg: #F2EDE6;
+  --arkive-card: #F8F4EE;
+  --arkive-parchment: #FFFAF0;
+  --arkive-text: #1C1A18;
+  --arkive-text-secondary: #6C665F;
+  --arkive-text-tertiary: rgba(28, 26, 24, 0.45);
+  --arkive-border: rgba(0, 0, 0, 0.06);
+  --arkive-border-strong: rgba(0, 0, 0, 0.12);
+  --arkive-accent: #9B7E5C;
+  --arkive-accent-soft: rgba(155, 126, 92, 0.12);
+  --arkive-accent-soft-half: rgba(155, 126, 92, 0.06);
+  --arkive-green: #4C8C5A;
+  --arkive-warn: #B07840;
+  --arkive-error: #9C3A2A;
+  --arkive-cta-fg: #FFFFFF;
+  --arkive-cta-bg: #000000;
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+  --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-10: 40px;
+  --space-12: 48px; --space-16: 64px;
+  --radius-xs: 6px; --radius-sm: 8px; --radius-md: 14px;
+  --radius-lg: 18px; --radius-xl: 20px; --radius-pill: 999px;
+  --shadow-row-resting: 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-row-hover: 0 2px 6px rgba(0, 0, 0, 0.04);
+  --shadow-row-expanded: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --shadow-floating: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast: 150ms; --duration-base: 220ms; --duration-slow: 350ms;
+  --font-serif: "Fraunces", "Iowan Old Style", "Hoefler Text", Georgia, "Times New Roman", serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 }
 * { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
 body {
+  background: var(--arkive-bg);
+  color: var(--arkive-text);
+  font-family: var(--font-serif);
+  font-size: 13px;
+  line-height: 1.4;
+  font-feature-settings: "kern" 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-variant-numeric: tabular-nums;
+}
+.container { padding: var(--space-8) var(--space-6) var(--space-12); }
+@media (min-width: 1024px) { .container { padding: var(--space-8) var(--space-8) var(--space-12); } }
+@media (min-width: 1440px) { .container { padding: var(--space-10) var(--space-12) var(--space-12); } }
+
+.page-header { margin-bottom: var(--space-8); }
+.page-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-6);
+  flex-wrap: wrap;
+}
+.page-title-block { flex: 1; min-width: 0; }
+.page-title {
+  font-family: var(--font-serif);
+  font-size: 28px;
+  font-weight: 500;
+  font-variation-settings: "opsz" 96;
+  margin: 0 0 var(--space-1);
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+  color: var(--arkive-text);
+}
+.page-sub {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--arkive-text-secondary);
   margin: 0;
-  background: var(--bg);
-  color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  font-size: 14px;
   line-height: 1.5;
 }
-.container { max-width: 1100px; margin: 0 auto; padding: 24px 20px 80px; }
-.page-header { margin-bottom: 24px; }
-.page-title { font-family: var(--serif); font-size: 28px; font-weight: 500; margin: 0 0 4px; }
-.page-sub { color: var(--text-muted); font-size: 13px; margin: 0; }
-.toolbar { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; align-items: center; }
-.filter-btn {
-  padding: 6px 14px; border: 1px solid var(--border); background: var(--card);
-  border-radius: 6px; cursor: pointer; font-size: 12px; color: var(--text-muted);
-  letter-spacing: 0.5px; text-transform: uppercase; transition: all 0.15s;
+.page-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-shrink: 0;
 }
-.filter-btn:hover { border-color: var(--accent); color: var(--text); }
-.filter-btn.active { background: var(--accent); border-color: var(--accent); color: #1C1A18; font-weight: 600; }
-.summary-row { display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+.toolbar {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+  flex-wrap: wrap;
+  align-items: center;
+}
+.summary-row {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+  flex-wrap: wrap;
+}
 .stat-pill {
-  background: var(--card); border: 1px solid var(--border); border-radius: 8px;
-  padding: 8px 14px; font-size: 12px; color: var(--text-muted);
+  background: transparent;
+  border: 1px solid var(--arkive-border);
+  border-radius: var(--radius-pill);
+  padding: 6px 14px;
+  font-size: 12px;
+  color: var(--arkive-text-secondary);
+  font-weight: 500;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
 }
-.stat-pill strong { color: var(--text); font-size: 14px; margin-right: 6px; }
-#status { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; min-height: 18px; }
-#status.error { color: var(--danger); }
+.stat-pill strong {
+  color: var(--arkive-text);
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.filter-btn {
+  height: 28px;
+  padding: 0 14px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  font-family: var(--font-serif);
+  font-size: 13px;
+  font-weight: 500;
+  background: transparent;
+  border: 1px solid var(--arkive-border);
+  color: var(--arkive-text-secondary);
+  transition: background-color var(--duration-fast) var(--ease-out),
+              border-color var(--duration-fast) var(--ease-out),
+              color var(--duration-fast) var(--ease-out);
+}
+.filter-btn:hover {
+  background: var(--arkive-accent-soft-half);
+  border-color: var(--arkive-border-strong);
+  color: var(--arkive-text);
+}
+.filter-btn.active {
+  background: var(--arkive-accent-soft);
+  border-color: var(--arkive-accent);
+  color: var(--arkive-accent);
+  font-weight: 600;
+}
+
+#status {
+  font-size: 12px;
+  color: var(--arkive-text-secondary);
+  margin-bottom: var(--space-3);
+  min-height: 18px;
+}
+#status.error { color: var(--arkive-error); }
+
 .loading-overlay {
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(250,250,250,0.85); display: flex; align-items: center;
-  justify-content: center; z-index: 100;
+  position: fixed;
+  inset: 0;
+  background: rgba(242, 237, 230, 0.85);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
 }
+.loading-overlay.show { display: flex; }
 .spinner {
-  width: 40px; height: 40px; border: 3px solid var(--accent-soft);
-  border-top-color: var(--accent); border-radius: 50%;
+  width: 28px; height: 28px;
+  border: 2px solid var(--arkive-accent-soft);
+  border-top-color: var(--arkive-accent);
+  border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
-.card {
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: 12px; padding: 0; margin-bottom: 16px; overflow: hidden;
+
+/* Login modal */
+.login-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(242, 237, 230, 0.96);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 300;
+  padding: var(--space-4);
 }
-.card-head {
-  padding: 18px 22px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
-  border-bottom: 1px solid var(--border);
+.login-modal.show { display: flex; }
+.login-card {
+  background: var(--arkive-card);
+  border: 1px solid var(--arkive-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-row-expanded);
+  padding: var(--space-8);
+  max-width: 380px;
+  width: 100%;
+  text-align: center;
 }
-.order-ref {
-  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
-  font-size: 13px; color: var(--accent); letter-spacing: 0.8px; font-weight: 600;
+.login-card h2 {
+  font-family: var(--font-serif);
+  font-size: 24px;
+  font-weight: 500;
+  font-variation-settings: "opsz" 36;
+  margin: 0 0 var(--space-2);
+  color: var(--arkive-text);
 }
-.capsule-title {
-  font-family: var(--serif); font-size: 20px; font-weight: 500; flex: 1;
-  margin: 0; min-width: 200px;
+.login-card p {
+  font-size: 13px;
+  color: var(--arkive-text-secondary);
+  margin: 0 0 var(--space-6);
 }
-.head-meta { font-size: 12px; color: var(--text-muted); }
-.status-chip {
-  display: inline-flex; align-items: center; gap: 4px;
-  padding: 4px 10px; border-radius: 999px; font-size: 11px;
-  letter-spacing: 1px; text-transform: uppercase; font-weight: 600;
-  border: 1px solid var(--border);
+.login-card .login-input {
+  width: 100%;
+  margin-bottom: var(--space-3);
+  text-align: left;
 }
-.chip-processing { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
-.chip-shipped { background: rgba(74,139,92,0.12); color: var(--success); border-color: var(--success); }
-.chip-delivered { background: rgba(74,139,92,0.18); color: var(--success); border-color: var(--success); }
-.phase-strip { display: grid; grid-template-columns: repeat(6, 1fr); border-bottom: 1px solid var(--border); }
-.phase-cell {
-  padding: 14px 8px; text-align: center; border-right: 1px solid var(--border);
-  font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted);
+.login-card .login-error {
+  color: var(--arkive-error);
+  font-size: 12px;
+  margin-top: var(--space-3);
+  min-height: 16px;
+}
+
+/* Order rows */
+.order-row {
   position: relative;
+  background: var(--arkive-card);
+  border: 1px solid var(--arkive-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-row-resting);
+  margin-bottom: var(--space-3);
+  overflow: hidden;
+  transition: box-shadow var(--duration-base) var(--ease-in-out);
 }
-.phase-cell:last-child { border-right: 0; }
-.phase-cell .marker {
-  display: block; width: 10px; height: 10px; border-radius: 50%;
-  background: #DDD; margin: 0 auto 6px;
+.order-row::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--arkive-accent);
+  border-top-left-radius: var(--radius-xl);
+  border-bottom-left-radius: var(--radius-xl);
+  opacity: 0;
+  transition: opacity var(--duration-base) var(--ease-in-out);
+  z-index: 1;
 }
-.phase-cell.done .marker { background: var(--success); }
-.phase-cell.done { color: var(--success); }
-.phase-cell .ts { display: block; font-size: 10px; color: var(--text-muted); margin-top: 2px; font-family: ui-monospace, monospace; letter-spacing: 0; text-transform: none; }
-.card-body { padding: 18px 22px; }
-.section { padding: 14px 0; border-bottom: 1px dashed var(--border); }
-.section:last-child { border-bottom: 0; padding-bottom: 0; }
+.order-row.is-expanded { box-shadow: var(--shadow-row-expanded); }
+.order-row.is-expanded::before { opacity: 1; }
+.order-row:not(.is-expanded):hover { box-shadow: var(--shadow-row-hover); }
+
+.order-row-header {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto 1fr auto auto auto;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-6);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  color: inherit;
+  transition: background-color var(--duration-fast) var(--ease-out);
+}
+.order-row-header:hover { background: var(--arkive-accent-soft-half); }
+
+.order-ref {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--arkive-accent);
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.order-title {
+  font-family: var(--font-serif);
+  font-size: 17px;
+  font-weight: 600;
+  font-variation-settings: "opsz" 24;
+  color: var(--arkive-text);
+  line-height: 1.3;
+  margin: 0;
+  letter-spacing: -0.005em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+.order-current-phase {
+  font-family: var(--font-serif);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--arkive-text-secondary);
+  white-space: nowrap;
+}
+.order-current-phase strong { color: var(--arkive-text); font-weight: 600; }
+
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-serif);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid var(--arkive-border);
+  white-space: nowrap;
+  font-variation-settings: "opsz" 11;
+}
+.chip-processing { background: var(--arkive-accent-soft); color: var(--arkive-accent); border-color: var(--arkive-accent); }
+.chip-shipped { background: rgba(76, 140, 90, 0.10); color: var(--arkive-green); border-color: var(--arkive-green); }
+.chip-delivered { background: rgba(76, 140, 90, 0.18); color: var(--arkive-green); border-color: var(--arkive-green); }
+
+.order-caret {
+  font-size: 18px;
+  color: var(--arkive-text-tertiary);
+  transition: transform var(--duration-base) var(--ease-in-out), color var(--duration-fast) var(--ease-out);
+  display: inline-flex;
+  width: 20px; height: 20px;
+  align-items: center; justify-content: center;
+}
+.order-row.is-expanded .order-caret {
+  transform: rotate(180deg);
+  color: var(--arkive-accent);
+}
+
+.order-row-body-wrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--duration-base) var(--ease-in-out);
+}
+.order-row.is-expanded .order-row-body-wrap { grid-template-rows: 1fr; }
+.order-row-body { overflow: hidden; min-height: 0; }
+.order-row-body-inner {
+  border-top: 1px solid var(--arkive-border);
+  padding: var(--space-6);
+}
+
+/* Phase strip */
+.phase-strip {
+  display: flex;
+  align-items: stretch;
+  margin-bottom: var(--space-6);
+  padding: 0 var(--space-2);
+}
+.phase-cell {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  position: relative;
+  padding-bottom: var(--space-2);
+}
+.phase-dot-row {
+  position: relative;
+  width: 100%;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.phase-dot-row::before, .phase-dot-row::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  height: 1px;
+  width: 50%;
+  background: var(--arkive-border-strong);
+  transform: translateY(-50%);
+}
+.phase-dot-row::before { left: 0; }
+.phase-dot-row::after { right: 0; }
+.phase-cell:first-child .phase-dot-row::before { display: none; }
+.phase-cell:last-child .phase-dot-row::after { display: none; }
+.phase-cell.line-left-green .phase-dot-row::before { background: var(--arkive-green); }
+.phase-cell.line-right-green .phase-dot-row::after { background: var(--arkive-green); }
+
+.phase-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: transparent;
+  border: 1px solid var(--arkive-border-strong);
+  position: relative;
+  z-index: 1;
+  transition: all var(--duration-base) var(--ease-out);
+}
+.phase-cell.is-active .phase-dot {
+  width: 14px; height: 14px;
+  background: var(--arkive-accent);
+  border-color: var(--arkive-accent);
+  animation: phase-pulse 1.6s var(--ease-in-out) infinite;
+}
+.phase-cell.is-completed .phase-dot {
+  background: var(--arkive-green);
+  border-color: var(--arkive-green);
+}
+.phase-cell.is-na .phase-dot {
+  background: var(--arkive-border);
+  border-color: var(--arkive-border-strong);
+  opacity: 0.5;
+}
+@keyframes phase-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+.phase-label {
+  font-family: var(--font-serif);
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--arkive-text-secondary);
+  text-align: center;
+  line-height: 1.3;
+  padding: 0 var(--space-1);
+}
+.phase-cell.is-active .phase-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--arkive-text);
+}
+.phase-cell.is-upcoming .phase-label { color: var(--arkive-text-tertiary); }
+.phase-cell.is-na .phase-label { color: var(--arkive-text-tertiary); font-style: italic; }
+.phase-ts {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--arkive-text-tertiary);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.section {
+  padding: var(--space-5) 0;
+  border-top: 1px solid var(--arkive-border);
+}
+.section:first-of-type { border-top: 0; padding-top: 0; }
 .section-head {
-  font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 600;
-  color: var(--text-muted); margin-bottom: 10px;
+  font-family: var(--font-serif);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--arkive-text-secondary);
+  margin-bottom: var(--space-3);
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
 }
-.kv { display: grid; grid-template-columns: 160px 1fr; gap: 6px 14px; font-size: 13px; }
-.kv .k { color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; padding-top: 1px; }
-.kv .v { color: var(--text); }
-.address-block { white-space: pre-line; font-size: 13px; color: var(--text); }
+.section-head .head-aux {
+  font-size: 11px;
+  color: var(--arkive-text-tertiary);
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  font-style: italic;
+}
+
+.kv {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: var(--space-2) var(--space-4);
+  font-size: 13px;
+}
+.kv .k {
+  color: var(--arkive-text-secondary);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding-top: 2px;
+}
+.kv .v {
+  color: var(--arkive-text);
+  font-weight: 400;
+  line-height: 1.5;
+}
+.kv .v.muted { color: var(--arkive-text-secondary); }
+.address-block { white-space: pre-line; line-height: 1.5; }
+
+.completion-note {
+  font-size: 13px;
+  color: var(--arkive-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.completion-note::before {
+  content: '\2713';
+  display: inline-block;
+  width: 16px; height: 16px;
+  background: var(--arkive-green);
+  color: #FFFFFF;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Buttons */
 .btn {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 8px 14px; border: 1px solid var(--border); background: var(--card);
-  border-radius: 6px; cursor: pointer; font-size: 12px;
-  letter-spacing: 0.5px; text-transform: uppercase; font-weight: 600;
-  color: var(--text); transition: all 0.15s;
+  height: 36px;
+  padding: 0 16px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-serif);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  border: 0;
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease-out),
+              border-color var(--duration-fast) var(--ease-out),
+              color var(--duration-fast) var(--ease-out);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  white-space: nowrap;
+  text-decoration: none;
 }
-.btn:hover { border-color: var(--accent); }
-.btn-accent {
-  background: var(--accent); color: #1C1A18; border-color: var(--accent);
+.btn--primary { background: var(--arkive-cta-bg); color: var(--arkive-cta-fg); }
+.btn--primary:hover { background: #1A1A1A; }
+.btn--secondary {
+  background: var(--arkive-card);
+  color: var(--arkive-text);
+  border: 1px solid var(--arkive-border-strong);
 }
-.btn-accent:hover { background: #B89860; border-color: #B89860; }
-.btn-success {
-  background: var(--success); color: white; border-color: var(--success);
+.btn--secondary:hover {
+  background: var(--arkive-accent-soft);
+  border-color: var(--arkive-accent);
 }
-.btn[disabled] { opacity: 0.5; cursor: not-allowed; }
-.actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
-.url-display {
-  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
-  font-size: 12px; padding: 10px 12px; background: #F4F2EE;
-  border: 1px solid var(--border); border-radius: 6px;
-  word-break: break-all; user-select: all; color: var(--text);
+.btn--tertiary {
+  background: transparent;
+  color: var(--arkive-accent);
+  padding: 0 var(--space-2);
 }
-.letter-preview {
-  font-family: var(--serif); font-size: 14px; line-height: 1.7;
-  background: #FBF8F1; border: 1px solid var(--border); border-radius: 6px;
-  padding: 18px 20px; white-space: pre-wrap; color: var(--text);
+.btn--tertiary:hover { background: var(--arkive-accent-soft); }
+.btn--full { width: 100%; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+  margin-top: var(--space-3);
 }
-.letter-title { font-weight: 600; font-size: 16px; margin-bottom: 12px; font-style: italic; }
-.photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; margin-top: 8px; }
-.photo-tile-link {
-  display: block; text-decoration: none; aspect-ratio: 1/1;
+
+.input-text, .login-input {
+  height: 36px;
+  padding: 0 14px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-serif);
+  font-size: 14px;
+  background: var(--arkive-parchment);
+  border: 1px solid var(--arkive-border-strong);
+  color: var(--arkive-text);
+  min-width: 220px;
+  transition: border-color var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out);
 }
-.photo-tile-num-card {
-  height: 100%; width: 100%;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  background: linear-gradient(135deg, #FBF8F1 0%, #F4F2EE 100%);
-  border: 1px solid var(--border); border-radius: 8px;
-  transition: all 0.15s; cursor: pointer;
-}
-.photo-tile-link:hover .photo-tile-num-card {
-  border-color: var(--accent); background: linear-gradient(135deg, #FFF4E0 0%, #F4F2EE 100%);
-  transform: translateY(-1px);
-}
-.photo-tile-num-card .big-num {
-  font-family: var(--serif); font-size: 32px; font-weight: 500;
-  color: var(--text); line-height: 1;
-}
-.photo-tile-num-card .dl-text {
-  font-size: 9px; letter-spacing: 1.5px; color: var(--accent);
-  font-weight: 700; margin-top: 8px;
+.input-text:focus, .login-input:focus {
+  outline: none;
+  border-color: var(--arkive-accent);
+  box-shadow: 0 0 0 2px var(--arkive-accent-soft);
 }
 .notes-area {
-  width: 100%; min-height: 60px; padding: 10px 12px; border: 1px solid var(--border);
-  border-radius: 6px; font-family: inherit; font-size: 13px; resize: vertical;
-  background: var(--card);
+  width: 100%;
+  min-height: 80px;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  font-family: var(--font-serif);
+  font-size: 14px;
+  line-height: 1.5;
+  background: var(--arkive-parchment);
+  border: 1px solid var(--arkive-border-strong);
+  color: var(--arkive-text);
+  resize: vertical;
+  transition: border-color var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out);
 }
-.notes-area:focus { outline: none; border-color: var(--accent); }
-.input-text {
-  padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px;
-  font-size: 13px; font-family: inherit; min-width: 220px;
+.notes-area:focus {
+  outline: none;
+  border-color: var(--arkive-accent);
+  box-shadow: 0 0 0 2px var(--arkive-accent-soft);
 }
-.input-text:focus { outline: none; border-color: var(--accent); }
-details summary {
-  cursor: pointer; padding: 6px 0; user-select: none;
-  font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted);
+
+.url-display {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: var(--space-3) var(--space-4);
+  background: var(--arkive-parchment);
+  border: 1px solid var(--arkive-border);
+  border-radius: var(--radius-md);
+  word-break: break-all;
+  user-select: all;
+  color: var(--arkive-text);
+  line-height: 1.5;
 }
-details[open] summary { color: var(--text); }
+
+.letter-preview {
+  font-family: var(--font-serif);
+  font-size: 14px;
+  line-height: 1.7;
+  background: var(--arkive-parchment);
+  border: 1px solid var(--arkive-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-5) var(--space-6);
+  white-space: pre-wrap;
+  color: var(--arkive-text);
+}
+.letter-title {
+  font-weight: 600;
+  font-size: 16px;
+  margin-bottom: var(--space-3);
+  font-style: italic;
+}
+
+/* Photo grid — true thumbnails on GitHub Pages */
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+.photo-tile {
+  display: block;
+  position: relative;
+  aspect-ratio: 1/1;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--arkive-border);
+  background: var(--arkive-parchment);
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color var(--duration-fast) var(--ease-out),
+              transform var(--duration-fast) var(--ease-out);
+}
+.photo-tile:hover {
+  border-color: var(--arkive-accent);
+  transform: translateY(-1px);
+}
+.photo-tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.photo-tile-num {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #FFFFFF;
+  font-family: var(--font-serif);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  font-variant-numeric: tabular-nums;
+}
+
+.inline-msg {
+  font-size: 13px;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  margin: var(--space-3) 0;
+  line-height: 1.5;
+}
+.inline-msg.warn {
+  background: rgba(176, 120, 64, 0.08);
+  border: 1px solid rgba(176, 120, 64, 0.30);
+  color: var(--arkive-text);
+}
+.inline-msg.success {
+  background: rgba(76, 140, 90, 0.06);
+  border: 1px solid rgba(76, 140, 90, 0.20);
+  color: var(--arkive-text-secondary);
+  font-size: 12px;
+}
+.inline-msg.error {
+  background: rgba(156, 58, 42, 0.06);
+  border: 1px solid rgba(156, 58, 42, 0.20);
+  color: var(--arkive-error);
+}
+
 .empty {
-  text-align: center; padding: 60px 20px; color: var(--text-muted);
-  font-family: var(--serif); font-size: 16px; font-style: italic;
+  text-align: center;
+  padding: var(--space-12) var(--space-6);
+  color: var(--arkive-text-secondary);
+  font-family: var(--font-serif);
+  font-size: 16px;
+  font-style: italic;
 }
+
 .toast {
-  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-  background: var(--text); color: white; padding: 10px 18px; border-radius: 6px;
-  font-size: 13px; opacity: 0; transition: opacity 0.2s; pointer-events: none;
+  position: fixed;
+  bottom: var(--space-6);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--arkive-text);
+  color: var(--arkive-cta-fg);
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-serif);
+  font-size: 13px;
+  font-weight: 500;
+  opacity: 0;
+  transition: opacity var(--duration-fast) var(--ease-out);
+  pointer-events: none;
   z-index: 200;
+  box-shadow: var(--shadow-floating);
 }
 .toast.show { opacity: 1; }
-.muted { color: var(--text-muted); }
+
+.muted { color: var(--arkive-text-secondary); }
 .tiny { font-size: 11px; }
-.login-wrap {
-  max-width: 380px; margin: 80px auto 0; padding: 0 20px;
+
+@media (max-width: 900px) {
+  .order-row-header {
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas:
+      "ref title caret"
+      "phase phase chip";
+    row-gap: var(--space-2);
+    column-gap: var(--space-3);
+  }
+  .order-ref { grid-area: ref; }
+  .order-title { grid-area: title; }
+  .order-current-phase { grid-area: phase; font-size: 12px; }
+  .order-caret { grid-area: caret; }
+  .order-row-header .status-chip { grid-area: chip; justify-self: end; }
+  .input-text { min-width: 0; flex: 1; }
 }
-.login-card {
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: 12px; padding: 28px 26px;
-}
-.login-title {
-  font-family: var(--serif); font-size: 24px; font-weight: 500;
-  margin: 0 0 4px;
-}
-.login-sub {
-  color: var(--text-muted); font-size: 13px; margin: 0 0 20px;
-}
-.login-field { margin-bottom: 14px; }
-.login-field label {
-  display: block; font-size: 11px; letter-spacing: 1px;
-  text-transform: uppercase; color: var(--text-muted);
-  margin-bottom: 6px; font-weight: 600;
-}
-.login-input {
-  width: 100%; padding: 10px 12px; border: 1px solid var(--border);
-  border-radius: 6px; font-size: 14px; font-family: inherit;
-  background: var(--card); color: var(--text);
-}
-.login-input:focus { outline: none; border-color: var(--accent); }
-.login-btn {
-  width: 100%; padding: 11px 14px; background: var(--accent); color: #1C1A18;
-  border: 1px solid var(--accent); border-radius: 6px; cursor: pointer;
-  font-size: 12px; letter-spacing: 0.8px; text-transform: uppercase;
-  font-weight: 700; transition: all 0.15s;
-}
-.login-btn:hover { background: #B89860; border-color: #B89860; }
-.login-btn[disabled] { opacity: 0.6; cursor: not-allowed; }
-.login-error {
-  font-size: 13px; color: var(--danger); margin-top: 10px; min-height: 18px;
-}
-.btn-logout {
-  margin-left: 8px; background: var(--card);
-}
-.user-pill {
-  font-size: 11px; color: var(--text-muted);
-  padding: 6px 10px; border-radius: 999px;
-  background: var(--card); border: 1px solid var(--border);
-}
-.user-pill strong { color: var(--text); }
 @media (max-width: 700px) {
-  .phase-strip { grid-template-columns: repeat(3, 1fr); }
-  .phase-cell:nth-child(3) { border-right: 0; }
-  .phase-cell:nth-child(4), .phase-cell:nth-child(5), .phase-cell:nth-child(6) { border-top: 1px solid var(--border); }
-  .phase-cell:nth-child(6) { border-right: 0; }
-  .kv { grid-template-columns: 1fr; gap: 2px 0; }
-  .kv .k { padding-top: 8px; }
+  .phase-strip { padding: 0; }
+  .phase-label { font-size: 10px; }
+  .phase-cell.is-active .phase-label { font-size: 11px; }
+  .phase-ts { display: none; }
+  .kv { grid-template-columns: 1fr; gap: 4px 0; }
+  .kv .k { padding-top: var(--space-2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+  .phase-cell.is-active .phase-dot { animation: none; }
 }
 </style>
 </head>
 <body>
 
-<div id="loadingOverlay" class="loading-overlay" style="display:none;">
-  <div class="spinner"></div>
-</div>
-
-<div id="loginWrap" class="login-wrap" style="display:none;">
+<!-- Login modal (shown when no auth) -->
+<div id="loginModal" class="login-modal">
   <div class="login-card">
-    <h1 class="login-title">Relic Fulfillment</h1>
-    <p class="login-sub">Sign in to access fulfillment data.</p>
-    <form id="loginForm">
-      <div class="login-field">
-        <label for="loginEmail">Email</label>
-        <input type="email" id="loginEmail" class="login-input" autocomplete="email" value="maurizio@brivioadvisory.com" required>
-      </div>
-      <div class="login-field">
-        <label for="loginPassword">Password</label>
-        <input type="password" id="loginPassword" class="login-input" autocomplete="current-password" required>
-      </div>
-      <button type="submit" id="loginBtn" class="login-btn">Sign in</button>
-      <div id="loginError" class="login-error"></div>
-    </form>
+    <h2>Arkive Fulfillment</h2>
+    <p>Enter team credentials to continue</p>
+    <input type="text" id="loginUser" class="login-input" placeholder="Username" autocomplete="username" autocapitalize="off" />
+    <input type="password" id="loginPass" class="login-input" placeholder="Password" autocomplete="current-password" />
+    <button class="btn btn--primary btn--full" onclick="doLogin()" style="margin-top: var(--space-2);">Sign in</button>
+    <div id="loginError" class="login-error"></div>
   </div>
 </div>
 
-<div id="dashboardWrap" class="container" style="display:none;">
+<div id="loadingOverlay" class="loading-overlay">
+  <div class="spinner"></div>
+</div>
+
+<div class="container" id="appContainer" style="display: none;">
   <header class="page-header">
-    <h1 class="page-title">Relic Fulfillment</h1>
-    <p class="page-sub">Walk each order through the six fulfillment phases. Status updates write directly to <code>arkive_relics</code> via the Supabase REST API. Click Reload to refresh.</p>
+    <div class="page-title-row">
+      <div class="page-title-block">
+        <h1 class="page-title">Relic Fulfillment</h1>
+        <p class="page-sub">Walk each order through the six fulfillment phases. Status updates write directly to <code>arkive_relics</code>.</p>
+      </div>
+      <div class="page-actions">
+        <button class="btn btn--secondary" onclick="loadAllRelics()" title="Reload orders">Refresh</button>
+        <button class="btn btn--tertiary" onclick="doLogout()" title="Sign out">Sign out</button>
+      </div>
+    </div>
     <div class="toolbar">
       <button class="filter-btn active" data-filter="active">Active orders</button>
       <button class="filter-btn" data-filter="all">All</button>
       <button class="filter-btn" data-filter="shipped">Shipped + delivered</button>
-      <button class="filter-btn" id="reloadBtn" style="margin-left:auto;">Reload</button>
-      <span class="user-pill" id="userPill"></span>
-      <button class="filter-btn btn-logout" id="logoutBtn">Sign out</button>
     </div>
     <div class="summary-row" id="summaryRow"></div>
   </header>
@@ -295,191 +804,128 @@ details[open] summary { color: var(--text); }
 <div id="toast" class="toast"></div>
 
 <script>
-const SUPABASE_URL = 'https://skrwdjxgvryodsxusqia.supabase.co';
-const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrcndkanhndnJ5b2RzeHVzcWlhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNzIxMjMsImV4cCI6MjA4OTk0ODEyM30.pmgv9jxIxwcKnJxq3Rz302zJQkAFccKqOa_g6SWFX0Q';
-const REST = SUPABASE_URL + '/rest/v1';
-const AUTH = SUPABASE_URL + '/auth/v1';
-const SESSION_KEY = 'arkive_fulfillment_session';
+const API_BASE = 'https://skrwdjxgvryodsxusqia.supabase.co/functions/v1/arkive-fulfillment';
+const AUTH_KEY = 'arkive-fulfillment-auth-v1';
+const STORAGE_KEY = 'arkive-fulfillment-expanded-v2';
 
-let session = null;
 let allRelics = [];
+let photoCache = {};
 let currentFilter = 'active';
+let expandedSet = restoreExpandedState();
 
-function authHeaders() {
-  const token = session?.access_token || ANON_KEY;
-  return { apikey: ANON_KEY, Authorization: 'Bearer ' + token };
+// === Auth ===
+function getAuth() {
+  try { return localStorage.getItem(AUTH_KEY); } catch (e) { return null; }
 }
-
-function loadStoredSession() {
-  try {
-    const raw = localStorage.getItem(SESSION_KEY);
-    if (!raw) return null;
-    const s = JSON.parse(raw);
-    if (s && s.expires_at && (s.expires_at * 1000) < Date.now() + 5000) return null;
-    return s;
-  } catch (e) { return null; }
+function setAuth(headerValue) {
+  try { localStorage.setItem(AUTH_KEY, headerValue); } catch (e) {}
 }
-
-function storeSession(s) {
-  session = s;
-  localStorage.setItem(SESSION_KEY, JSON.stringify(s));
+function clearAuth() {
+  try { localStorage.removeItem(AUTH_KEY); } catch (e) {}
 }
-
-function clearStoredSession() {
-  session = null;
-  localStorage.removeItem(SESSION_KEY);
-}
-
-async function signIn(email, password) {
-  const res = await fetch(AUTH + '/token?grant_type=password', {
-    method: 'POST',
-    headers: { apikey: ANON_KEY, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password })
-  });
-  const text = await res.text();
-  let data;
-  try { data = text ? JSON.parse(text) : {}; } catch (e) { data = { error_description: text }; }
-  if (!res.ok) {
-    throw new Error(data.error_description || data.msg || data.message || `Sign-in failed (${res.status})`);
-  }
-  storeSession(data);
-  return data;
-}
-
-async function signOut() {
-  if (session?.access_token) {
-    try {
-      await fetch(AUTH + '/logout', { method: 'POST', headers: authHeaders() });
-    } catch (e) { /* ignore */ }
-  }
-  clearStoredSession();
-}
-
 function showLogin() {
-  document.getElementById('loginWrap').style.display = 'block';
-  document.getElementById('dashboardWrap').style.display = 'none';
-  document.getElementById('loadingOverlay').style.display = 'none';
-  setTimeout(() => {
-    const pwd = document.getElementById('loginPassword');
-    if (pwd) pwd.focus();
-  }, 50);
+  document.getElementById('loginModal').classList.add('show');
+  document.getElementById('appContainer').style.display = 'none';
+  setTimeout(() => { document.getElementById('loginUser').focus(); }, 100);
+}
+function hideLogin() {
+  document.getElementById('loginModal').classList.remove('show');
+  document.getElementById('appContainer').style.display = 'block';
+}
+async function doLogin() {
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  const errEl = document.getElementById('loginError');
+  errEl.textContent = '';
+  if (!u || !p) { errEl.textContent = 'Username and password required'; return; }
+  const headerValue = 'Basic ' + btoa(u + ':' + p);
+  setAuth(headerValue);
+  try {
+    showLoading(true);
+    const data = await apiCall('/api/list', {});
+    allRelics = data.relics || [];
+    hideLogin();
+    document.getElementById('loginPass').value = '';
+    if (expandedSet.size === 0 && allRelics.length > 0) {
+      const firstActive = allRelics.find(r => !r.delivered_at);
+      if (firstActive) { expandedSet.add(firstActive.id); persistExpandedState(); }
+    }
+    renderSummary();
+    renderOrders();
+    setStatus(`Loaded ${allRelics.length} order${allRelics.length === 1 ? '' : 's'}.`);
+  } catch (e) {
+    clearAuth();
+    errEl.textContent = (e.status === 401) ? 'Invalid credentials' : ('Sign-in failed: ' + (e.message || 'unknown'));
+  } finally {
+    showLoading(false);
+  }
+}
+function doLogout() {
+  clearAuth();
+  allRelics = [];
+  document.getElementById('orders').innerHTML = '';
+  document.getElementById('summaryRow').innerHTML = '';
+  setStatus('');
+  showLogin();
+}
+async function apiCall(endpoint, body) {
+  const auth = getAuth();
+  if (!auth) { showLogin(); throw Object.assign(new Error('Not authenticated'), { status: 401 }); }
+  const resp = await fetch(API_BASE + endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': auth },
+    body: JSON.stringify(body || {})
+  });
+  if (resp.status === 401) {
+    clearAuth();
+    showLogin();
+    throw Object.assign(new Error('Session expired — sign in again'), { status: 401 });
+  }
+  if (!resp.ok) {
+    let msg = 'API error: ' + resp.status;
+    try { const j = await resp.json(); if (j && j.error) msg = j.error; } catch (e) {}
+    throw Object.assign(new Error(msg), { status: resp.status });
+  }
+  return await resp.json();
 }
 
-function showDashboard() {
-  document.getElementById('loginWrap').style.display = 'none';
-  document.getElementById('dashboardWrap').style.display = 'block';
-  const pill = document.getElementById('userPill');
-  const userEmail = session?.user?.email || '';
-  pill.innerHTML = userEmail ? `Signed in as <strong>${escapeHtml(userEmail)}</strong>` : '';
-}
-
+// === UI helpers ===
 function setStatus(msg, isError) {
   const el = document.getElementById('status');
   el.textContent = msg || '';
   el.className = isError ? 'error' : '';
 }
-
 function showLoading(show) {
-  document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
+  document.getElementById('loadingOverlay').classList.toggle('show', !!show);
 }
-
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 1800);
 }
-
 function escapeHtml(s) {
   if (s == null) return '';
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
-function handleAuthFailure() {
-  clearStoredSession();
-  showLogin();
-  setStatus('Session expired. Please sign in again.', true);
-  showLoading(false);
-}
-
-async function restGet(path) {
-  const res = await fetch(REST + path, { headers: authHeaders() });
-  if (res.status === 401) {
-    handleAuthFailure();
-    throw new Error('Authentication required');
-  }
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error(`GET ${path} → ${res.status}: ${body.slice(0, 200)}`);
-  }
-  return res.json();
-}
-
-async function restPatch(path, body) {
-  const res = await fetch(REST + path, {
-    method: 'PATCH',
-    headers: { ...authHeaders(), 'Content-Type': 'application/json', Prefer: 'return=representation' },
-    body: JSON.stringify(body)
-  });
-  if (res.status === 401) {
-    handleAuthFailure();
-    throw new Error('Authentication required');
-  }
-  if (!res.ok) {
-    const t = await res.text();
-    throw new Error(`PATCH ${path} → ${res.status}: ${t.slice(0, 200)}`);
-  }
-  return res.json();
-}
-
+// === Data ===
 async function loadAllRelics() {
+  if (!getAuth()) { showLogin(); return; }
   showLoading(true);
   setStatus('Loading orders…');
   try {
-    const relics = await restGet('/arkive_relics?select=*&order=ordered_at.desc');
-    const userIds = [...new Set(relics.map(r => r.creator_user_id).filter(Boolean))];
-    const capsuleIds = [...new Set(relics.map(r => r.capsule_id).filter(Boolean))];
-    const [accounts, capsules] = await Promise.all([
-      userIds.length
-        ? restGet(`/accounts?select=id,email,display_name&id=in.(${userIds.join(',')})`)
-        : Promise.resolve([]),
-      capsuleIds.length
-        ? restGet(`/capsules?select=id,title,items_json&id=in.(${capsuleIds.join(',')})`)
-        : Promise.resolve([])
-    ]);
-    const accountById = Object.fromEntries(accounts.map(a => [a.id, a]));
-    const capsuleById = Object.fromEntries(capsules.map(c => [c.id, c]));
-
-    allRelics = relics.map(r => {
-      const acc = accountById[r.creator_user_id];
-      const caps = capsuleById[r.capsule_id];
-      let chosenLetter = null;
-      if (caps && Array.isArray(caps.items_json) && r.letter_id) {
-        const found = caps.items_json.find(e =>
-          e && e.kind === 'Letter' && String(e.id) === String(r.letter_id)
-        );
-        if (found) {
-          chosenLetter = {
-            id: found.id,
-            title: found.title,
-            body: found.subtitle,
-            sort_index: found.sort_index != null ? parseInt(found.sort_index, 10) : 0
-          };
-        }
-      }
-      return Object.assign({}, r, {
-        purchaser_email: acc?.email || null,
-        purchaser_name: acc?.display_name || null,
-        capsule_full_title: caps?.title || null,
-        chosen_letter: chosenLetter
-      });
-    });
-
+    const data = await apiCall('/api/list', {});
+    allRelics = data.relics || [];
+    if (expandedSet.size === 0 && allRelics.length > 0) {
+      const firstActive = allRelics.find(r => !r.delivered_at);
+      if (firstActive) { expandedSet.add(firstActive.id); persistExpandedState(); }
+    }
     renderSummary();
     renderOrders();
     setStatus(`Loaded ${allRelics.length} order${allRelics.length === 1 ? '' : 's'}.`);
   } catch (e) {
-    setStatus('Failed to load: ' + e.message, true);
+    if (e.status !== 401) setStatus('Failed to load: ' + e.message, true);
   } finally {
     showLoading(false);
   }
@@ -488,7 +934,6 @@ async function loadAllRelics() {
 function renderSummary() {
   const sumRow = document.getElementById('summaryRow');
   const total = allRelics.length;
-  const active = allRelics.filter(r => !r.delivered_at).length;
   const inProcessing = allRelics.filter(r => !r.shipped_at).length;
   const shipped = allRelics.filter(r => r.shipped_at && !r.delivered_at).length;
   const delivered = allRelics.filter(r => r.delivered_at).length;
@@ -506,11 +951,7 @@ function renderOrders() {
   if (currentFilter === 'active') filtered = allRelics.filter(r => !r.delivered_at);
   else if (currentFilter === 'shipped') filtered = allRelics.filter(r => r.shipped_at);
   else filtered = allRelics;
-
-  if (filtered.length === 0) {
-    container.innerHTML = `<div class="empty">No orders match this filter.</div>`;
-    return;
-  }
+  if (filtered.length === 0) { container.innerHTML = `<div class="empty">No orders match this filter.</div>`; return; }
   container.innerHTML = filtered.map(renderCard).join('');
   bindCardEvents();
 }
@@ -519,33 +960,26 @@ function formatOrderRef(uuid) {
   const seg = (uuid || '').replace(/-/g, '').slice(0, 8).toUpperCase();
   return `${seg.slice(0,4)}-${seg.slice(4,8)}`;
 }
-
 function fmtDate(s) {
   if (!s) return '—';
-  const d = new Date(s);
-  return d.toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' });
+  return new Date(s).toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' });
 }
-
 function fmtDateTime(s) {
   if (!s) return '—';
-  const d = new Date(s);
-  return d.toLocaleString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+  return new Date(s).toLocaleString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
 }
-
 function fmtPrice(p, c) {
   const n = parseFloat(p || 0);
   const sym = c === 'EUR' ? '€' : c === 'USD' ? '$' : (c + ' ');
   return sym + n.toFixed(2);
 }
-
 function statusChip(r) {
   if (r.delivered_at) return `<span class="status-chip chip-delivered">Delivered</span>`;
   if (r.shipped_at) return `<span class="status-chip chip-shipped">Shipped</span>`;
   return `<span class="status-chip chip-processing">${escapeHtml(r.order_status || 'Processing')}</span>`;
 }
-
-function phaseStrip(r) {
-  const phases = [
+function computePhases(r) {
+  return [
     { label: 'Photos printed', ts: r.photos_printed_at, applicable: true },
     { label: r.has_letter ? 'Letter printed' : 'Letter (n/a)', ts: r.letter_printed_at, applicable: !!r.has_letter },
     { label: 'NFC encoded', ts: r.nfc_encoded_at, applicable: true },
@@ -553,23 +987,51 @@ function phaseStrip(r) {
     { label: 'Shipped', ts: r.shipped_at, applicable: true },
     { label: 'Delivered', ts: r.delivered_at, applicable: true },
   ];
-  return `<div class="phase-strip">${phases.map(p => `
-    <div class="phase-cell ${p.ts ? 'done' : ''} ${!p.applicable ? 'na' : ''}">
-      <span class="marker"></span>
-      ${escapeHtml(p.label)}
-      <span class="ts">${p.ts ? fmtDate(p.ts) : (!p.applicable ? '—' : 'pending')}</span>
-    </div>
-  `).join('')}</div>`;
+}
+function findActivePhase(phases) {
+  for (let i = 0; i < phases.length; i++) {
+    if (phases[i].applicable && !phases[i].ts) return i;
+  }
+  return -1;
+}
+function phaseStateClass(phase, i, activeIdx) {
+  if (!phase.applicable) return 'is-na';
+  if (phase.ts) return 'is-completed';
+  if (i === activeIdx) return 'is-active';
+  return 'is-upcoming';
+}
+function renderPhaseStrip(phases, activeIdx) {
+  return `<div class="phase-strip">${phases.map((p, i) => {
+    const stateClass = phaseStateClass(p, i, activeIdx);
+    const lineLeftGreen = i > 0 && (activeIdx === -1 || (i - 1) < activeIdx);
+    const lineRightGreen = activeIdx === -1 ? (i < phases.length - 1) : (i < activeIdx);
+    const cellClasses = ['phase-cell', stateClass];
+    if (lineLeftGreen) cellClasses.push('line-left-green');
+    if (lineRightGreen) cellClasses.push('line-right-green');
+    const tsLabel = p.ts ? fmtDate(p.ts) : '';
+    return `
+      <div class="${cellClasses.join(' ')}">
+        <div class="phase-dot-row"><span class="phase-dot"></span></div>
+        <div class="phase-label">${escapeHtml(p.label)}</div>
+        ${tsLabel ? `<div class="phase-ts">${escapeHtml(tsLabel)}</div>` : ''}
+      </div>
+    `;
+  }).join('')}</div>`;
+}
+function currentPhaseSummary(phases, activeIdx) {
+  if (activeIdx === -1) return `<strong>All phases complete</strong>`;
+  const num = activeIdx + 1;
+  const label = phases[activeIdx].label;
+  return `Phase ${num} · <strong>${escapeHtml(label)}</strong>`;
 }
 
 function renderCard(r) {
   const orderRef = formatOrderRef(r.id);
-  // Letter resolution: chosen_letter from capsule (filtered by letter_id) → snapshot fallback
+  const isExpanded = expandedSet.has(r.id);
+  const phases = computePhases(r);
+  const activeIdx = findActivePhase(phases);
   const chosenLetter = r.chosen_letter || (r.letter_content_snapshot ? { id:'snapshot', title:'(from order-time snapshot)', body: r.letter_content_snapshot, sort_index: 0 } : null);
   const letterSource = r.chosen_letter ? 'capsule' : (r.letter_content_snapshot ? 'snapshot' : 'none');
-  // Photo selection state
-  const selectedPhotoIds = Array.isArray(r.selected_photo_ids) ? r.selected_photo_ids : null;
-  const selectionUnknown = !selectedPhotoIds || selectedPhotoIds.length === 0;
   const giftRecipient = r.shipping_recipient_full_name || r.recipient_name || '—';
   const address = [
     r.shipping_street,
@@ -578,121 +1040,131 @@ function renderCard(r) {
   ].filter(Boolean).join('\n');
 
   return `
-  <div class="card" data-id="${escapeHtml(r.id)}">
-    <div class="card-head">
-      <div>
-        <div class="order-ref">${orderRef}</div>
-        <div class="head-meta">Ordered ${fmtDate(r.ordered_at)} · ${fmtPrice(r.price, r.currency)}</div>
-      </div>
-      <h2 class="capsule-title">${escapeHtml(r.capsule_title || 'Untitled capsule')}</h2>
+  <div class="order-row ${isExpanded ? 'is-expanded' : ''}" data-id="${escapeHtml(r.id)}" id="order-${escapeHtml(r.id)}">
+    <button class="order-row-header" data-action="toggle" data-id="${escapeHtml(r.id)}" aria-expanded="${isExpanded}">
+      <span class="order-ref">${orderRef}</span>
+      <span class="order-title">${escapeHtml(r.capsule_title || 'Untitled capsule')}</span>
+      <span class="order-current-phase">${currentPhaseSummary(phases, activeIdx)}</span>
       ${statusChip(r)}
-    </div>
+      <span class="order-caret" aria-hidden="true">▾</span>
+    </button>
+    <div class="order-row-body-wrap">
+      <div class="order-row-body">
+        <div class="order-row-body-inner">
+          ${renderPhaseStrip(phases, activeIdx)}
 
-    ${phaseStrip(r)}
+          <div class="section">
+            <div class="section-head">Order info</div>
+            <div class="kv">
+              <div class="k">Purchaser</div>
+              <div class="v">${escapeHtml(r.purchaser_name || '')} <span class="muted">&lt;${escapeHtml(r.purchaser_email || '')}&gt;</span></div>
+              <div class="k">Gift recipient</div>
+              <div class="v">${escapeHtml(giftRecipient)}</div>
+              <div class="k">Shipping</div>
+              <div class="v address-block">${escapeHtml(address)}</div>
+              <div class="k">Phone</div>
+              <div class="v">${escapeHtml(r.shipping_phone || '—')}</div>
+              <div class="k">Photos / Letter</div>
+              <div class="v">${r.photo_count} photo${r.photo_count === 1 ? '' : 's'}${r.has_letter ? ' + letter' : ' (no letter)'}</div>
+              <div class="k">Ordered</div>
+              <div class="v">${fmtDate(r.ordered_at)} · ${fmtPrice(r.price, r.currency)}</div>
+              <div class="k">Confirmation email</div>
+              <div class="v">${r.confirmation_email_sent_at ? '✓ sent ' + fmtDateTime(r.confirmation_email_sent_at) : '<span class="muted">not sent yet</span>'}</div>
+            </div>
+          </div>
 
-    <div class="card-body">
+          <div class="section">
+            <div class="section-head">Phase 2 — Photos for print partner</div>
+            ${r.photos_printed_at
+              ? `<div class="completion-note">Marked printed ${fmtDate(r.photos_printed_at)}</div>`
+              : `<div class="actions" id="photo-actions-${escapeHtml(r.id)}">
+                  <button class="btn btn--primary" data-action="mark" data-field="photos_printed_at" data-id="${escapeHtml(r.id)}">Mark photos printed</button>
+                  <button class="btn btn--secondary" data-action="load-photos" data-id="${escapeHtml(r.id)}">Load photos</button>
+                </div>
+                <div id="photos-${escapeHtml(r.id)}"></div>`
+            }
+          </div>
 
-      <div class="section">
-        <div class="section-head">Order info</div>
-        <div class="kv">
-          <div class="k">Purchaser</div>
-          <div class="v">${escapeHtml(r.purchaser_name || '')} <span class="muted">&lt;${escapeHtml(r.purchaser_email || '')}&gt;</span></div>
-          <div class="k">Gift recipient</div>
-          <div class="v">${escapeHtml(giftRecipient)}</div>
-          <div class="k">Shipping</div>
-          <div class="v address-block">${escapeHtml(address)}</div>
-          <div class="k">Phone</div>
-          <div class="v">${escapeHtml(r.shipping_phone || '—')}</div>
-          <div class="k">Photos / Letter</div>
-          <div class="v">${r.photo_count} photo${r.photo_count === 1 ? '' : 's'}${r.has_letter ? ' + letter' : ' (no letter)'}</div>
-          <div class="k">Confirmation email</div>
-          <div class="v">${r.confirmation_email_sent_at ? '✓ sent ' + fmtDateTime(r.confirmation_email_sent_at) : '<span class="muted">not sent yet</span>'}</div>
+          ${r.has_letter ? `
+          <div class="section">
+            <div class="section-head">Phase 3 — Letter for print partner ${letterSource === 'snapshot' ? '<span class="head-aux">from snapshot</span>' : ''}</div>
+            ${chosenLetter
+              ? `<div class="letter-preview"><div class="letter-title">${escapeHtml(chosenLetter.title || 'Untitled letter')}</div>${escapeHtml(chosenLetter.body || '')}</div>`
+              : `<div class="muted tiny">No letter content found. letter_id=${escapeHtml(r.letter_id || 'null')}, capsule had no matching item, no snapshot available.</div>`
+            }
+            ${r.letter_printed_at
+              ? `<div class="completion-note" style="margin-top:var(--space-3);">Marked printed ${fmtDate(r.letter_printed_at)}</div>`
+              : `<div class="actions">
+                  <button class="btn btn--primary" data-action="mark" data-field="letter_printed_at" data-id="${escapeHtml(r.id)}">Mark letter printed</button>
+                  <button class="btn btn--secondary" data-action="copy-letter" data-id="${escapeHtml(r.id)}">Copy letter text</button>
+                </div>`
+            }
+          </div>
+          ` : ''}
+
+          <div class="section">
+            <div class="section-head">Phase 4 — NFC card</div>
+            <div class="muted tiny" style="margin-bottom:var(--space-2);">Copy this URL into NFC Tools / TagWriter on your phone, write to a blank NFC card, then mark encoded.</div>
+            <div class="url-display">${escapeHtml(r.nfc_deep_link || '')}</div>
+            ${r.nfc_encoded_at
+              ? `<div class="completion-note" style="margin-top:var(--space-3);">Marked encoded ${fmtDate(r.nfc_encoded_at)}</div>`
+              : `<div class="actions">
+                  <button class="btn btn--primary" data-action="mark" data-field="nfc_encoded_at" data-id="${escapeHtml(r.id)}">Mark NFC encoded</button>
+                  <button class="btn btn--secondary" data-action="copy-nfc" data-id="${escapeHtml(r.id)}">Copy URL</button>
+                </div>`
+            }
+          </div>
+
+          <div class="section">
+            <div class="section-head">Phase 5 — Seal &amp; assemble</div>
+            ${r.sealed_at
+              ? `<div class="completion-note">Marked sealed ${fmtDate(r.sealed_at)}</div>`
+              : `<div class="actions">
+                  <button class="btn btn--primary" data-action="mark" data-field="sealed_at" data-id="${escapeHtml(r.id)}">Mark sealed</button>
+                </div>`
+            }
+          </div>
+
+          <div class="section">
+            <div class="section-head">Phase 6 — Ship &amp; track</div>
+            ${r.shipped_at ? `
+              <div class="kv">
+                <div class="k">Shipped</div>
+                <div class="v">${fmtDate(r.shipped_at)}</div>
+                <div class="k">Tracking #</div>
+                <div class="v">${escapeHtml(r.tracking_number || '—')}</div>
+                <div class="k">Delivered</div>
+                <div class="v">${r.delivered_at ? '✓ ' + fmtDate(r.delivered_at) : '<span class="muted">not yet</span>'}</div>
+              </div>
+              ${!r.delivered_at ? `<div class="actions"><button class="btn btn--primary" data-action="mark" data-field="delivered_at" data-id="${escapeHtml(r.id)}">Mark delivered</button></div>` : ''}
+            ` : `
+              <div class="actions">
+                <input type="text" class="input-text" placeholder="Tracking #" id="tracking-${escapeHtml(r.id)}" />
+                <button class="btn btn--primary" data-action="ship" data-id="${escapeHtml(r.id)}">Mark shipped</button>
+              </div>
+            `}
+          </div>
+
+          <div class="section">
+            <div class="section-head">Notes</div>
+            <textarea class="notes-area" data-action="notes" data-id="${escapeHtml(r.id)}" placeholder="Free-form notes for the team (reprints, NFC retries, partner-side issues, etc.)">${escapeHtml(r.fulfillment_notes || '')}</textarea>
+          </div>
         </div>
       </div>
-
-      <div class="section">
-        <div class="section-head">Phase 2 — Photos for print partner</div>
-        ${r.photos_printed_at
-          ? `<div class="muted">✓ Marked printed ${fmtDate(r.photos_printed_at)}</div>`
-          : `<div class="actions" id="photo-actions-${escapeHtml(r.id)}">
-              <button class="btn" data-action="load-photos" data-id="${escapeHtml(r.id)}">Load photo URLs</button>
-              <button class="btn btn-success" data-action="mark" data-field="photos_printed_at" data-id="${escapeHtml(r.id)}">Mark photos printed</button>
-            </div>
-            <div id="photos-${escapeHtml(r.id)}"></div>`
-        }
-      </div>
-
-      ${r.has_letter ? `
-      <div class="section">
-        <div class="section-head">Phase 3 — Letter for print partner ${letterSource === 'snapshot' ? '<span class="tiny muted">(from snapshot)</span>' : ''}</div>
-        ${chosenLetter
-          ? `<div class="letter-preview"><div class="letter-title">${escapeHtml(chosenLetter.title || 'Untitled letter')}</div>${escapeHtml(chosenLetter.body || '')}</div>`
-          : `<div class="muted tiny">No letter content found. letter_id=${escapeHtml(r.letter_id || 'null')}, capsule had no matching item, no snapshot available.</div>`
-        }
-        ${r.letter_printed_at
-          ? `<div class="muted" style="margin-top:10px;">✓ Marked printed ${fmtDate(r.letter_printed_at)}</div>`
-          : `<div class="actions">
-              <button class="btn btn-success" data-action="mark" data-field="letter_printed_at" data-id="${escapeHtml(r.id)}">Mark letter printed</button>
-              <button class="btn" data-action="copy-letter" data-id="${escapeHtml(r.id)}">Copy letter text</button>
-            </div>`
-        }
-      </div>
-      ` : ''}
-
-      <div class="section">
-        <div class="section-head">Phase 4 — NFC card</div>
-        <div class="muted tiny" style="margin-bottom:6px;">Copy this URL into NFC Tools / TagWriter on your phone, write to a blank NFC card, then mark encoded.</div>
-        <div class="url-display">${escapeHtml(r.nfc_deep_link || '')}</div>
-        ${r.nfc_encoded_at
-          ? `<div class="muted" style="margin-top:10px;">✓ Marked encoded ${fmtDate(r.nfc_encoded_at)}</div>`
-          : `<div class="actions">
-              <button class="btn" data-action="copy-nfc" data-id="${escapeHtml(r.id)}">Copy URL</button>
-              <button class="btn btn-success" data-action="mark" data-field="nfc_encoded_at" data-id="${escapeHtml(r.id)}">Mark NFC encoded</button>
-            </div>`
-        }
-      </div>
-
-      <div class="section">
-        <div class="section-head">Phase 5 — Seal &amp; assemble</div>
-        ${r.sealed_at
-          ? `<div class="muted">✓ Marked sealed ${fmtDate(r.sealed_at)}</div>`
-          : `<div class="actions">
-              <button class="btn btn-success" data-action="mark" data-field="sealed_at" data-id="${escapeHtml(r.id)}">Mark sealed</button>
-            </div>`
-        }
-      </div>
-
-      <div class="section">
-        <div class="section-head">Phase 6 — Ship &amp; track</div>
-        ${r.shipped_at ? `
-          <div class="kv">
-            <div class="k">Shipped</div>
-            <div class="v">${fmtDate(r.shipped_at)}</div>
-            <div class="k">Tracking #</div>
-            <div class="v">${escapeHtml(r.tracking_number || '—')}</div>
-            <div class="k">Delivered</div>
-            <div class="v">${r.delivered_at ? '✓ ' + fmtDate(r.delivered_at) : 'not yet'}</div>
-          </div>
-          ${!r.delivered_at ? `<div class="actions"><button class="btn btn-success" data-action="mark" data-field="delivered_at" data-id="${escapeHtml(r.id)}">Mark delivered</button></div>` : ''}
-        ` : `
-          <div class="actions" style="align-items:center;">
-            <input type="text" class="input-text" placeholder="Tracking #" id="tracking-${escapeHtml(r.id)}" />
-            <button class="btn btn-success" data-action="ship" data-id="${escapeHtml(r.id)}">Mark shipped</button>
-          </div>
-        `}
-      </div>
-
-      <div class="section">
-        <div class="section-head">Notes</div>
-        <textarea class="notes-area" data-action="notes" data-id="${escapeHtml(r.id)}" placeholder="Free-form notes for the team (reprints, NFC retries, partner-side issues, etc.)">${escapeHtml(r.fulfillment_notes || '')}</textarea>
-      </div>
-
     </div>
   </div>`;
 }
 
 function bindCardEvents() {
-  // Action buttons
+  document.querySelectorAll('[data-action="toggle"]').forEach(btn => {
+    btn.addEventListener('click', (ev) => {
+      if (ev.target.closest('button[data-action]:not([data-action="toggle"]), input, textarea, a, .input-text')) return;
+      toggleExpanded(btn.dataset.id);
+    });
+  });
+  document.querySelectorAll('.order-row-body button, .order-row-body input, .order-row-body textarea, .order-row-body a').forEach(el => {
+    el.addEventListener('click', (ev) => ev.stopPropagation());
+  });
   document.querySelectorAll('[data-action="mark"]').forEach(btn => {
     btn.addEventListener('click', () => markPhase(btn.dataset.id, btn.dataset.field));
   });
@@ -705,21 +1177,54 @@ function bindCardEvents() {
   document.querySelectorAll('[data-action="copy-nfc"]').forEach(btn => {
     btn.addEventListener('click', () => {
       const r = allRelics.find(x => x.id === btn.dataset.id);
-      copyToClipboard(r?.nfc_deep_link || '');
+      copyToClipboard(r && r.nfc_deep_link || '');
     });
   });
   document.querySelectorAll('[data-action="copy-letter"]').forEach(btn => {
     btn.addEventListener('click', () => {
       const r = allRelics.find(x => x.id === btn.dataset.id);
-      const chosen = r?.chosen_letter || (r?.letter_content_snapshot ? { title:'', body:r.letter_content_snapshot } : null);
+      const chosen = (r && r.chosen_letter) || (r && r.letter_content_snapshot ? { title:'', body:r.letter_content_snapshot } : null);
       if (!chosen) { showToast('No letter content to copy'); return; }
       copyToClipboard((chosen.title ? chosen.title + '\n\n' : '') + (chosen.body || ''));
     });
   });
-  // Notes textarea (debounced save on blur)
   document.querySelectorAll('[data-action="notes"]').forEach(ta => {
     ta.addEventListener('blur', () => saveNotes(ta.dataset.id, ta.value));
   });
+}
+
+function toggleExpanded(relicId) {
+  const row = document.getElementById('order-' + relicId);
+  if (!row) return;
+  const wasExpanded = row.classList.contains('is-expanded');
+  if (wasExpanded) {
+    row.classList.remove('is-expanded');
+    expandedSet.delete(relicId);
+    const headerBtn = row.querySelector('[data-action="toggle"]');
+    if (headerBtn) headerBtn.setAttribute('aria-expanded', 'false');
+  } else {
+    row.classList.add('is-expanded');
+    expandedSet.add(relicId);
+    const headerBtn = row.querySelector('[data-action="toggle"]');
+    if (headerBtn) headerBtn.setAttribute('aria-expanded', 'true');
+    setTimeout(() => {
+      const top = row.getBoundingClientRect().top + window.scrollY;
+      const target = top - 48;
+      window.scrollTo({ top: target < 0 ? 0 : target, behavior: 'smooth' });
+    }, 60);
+  }
+  persistExpandedState();
+}
+
+function persistExpandedState() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify([...expandedSet])); } catch (e) {}
+}
+function restoreExpandedState() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) return new Set(JSON.parse(saved));
+  } catch (e) {}
+  return new Set();
 }
 
 function copyToClipboard(text) {
@@ -738,129 +1243,137 @@ function copyToClipboard(text) {
 
 async function markPhase(relicId, field) {
   showLoading(true);
-  setStatus(`Marking ${field}…`);
+  setStatus('Marking ' + field + '…');
   try {
-    const now = new Date().toISOString();
-    await restPatch(`/arkive_relics?id=eq.${encodeURIComponent(relicId)}`, {
-      [field]: now,
-      updated_at: now
-    });
+    await apiCall('/api/update', { relic_id: relicId, field });
     await loadAllRelics();
     showToast('Updated');
   } catch (e) {
-    setStatus('Update failed: ' + e.message, true);
+    if (e.status !== 401) setStatus('Update failed: ' + e.message, true);
     showLoading(false);
   }
 }
 
 async function markShipped(relicId) {
-  const trackingInput = document.getElementById(`tracking-${relicId}`);
-  const tracking = (trackingInput?.value || '').trim();
-  if (!tracking) {
-    setStatus('Enter a tracking number first.', true);
-    return;
-  }
+  const trackingInput = document.getElementById('tracking-' + relicId);
+  const tracking = (trackingInput && trackingInput.value || '').trim();
+  if (!tracking) { setStatus('Enter a tracking number first.', true); return; }
   showLoading(true);
   setStatus('Marking shipped…');
   try {
-    const now = new Date().toISOString();
-    await restPatch(`/arkive_relics?id=eq.${encodeURIComponent(relicId)}`, {
-      shipped_at: now,
-      tracking_number: tracking,
-      order_status: 'Shipped',
-      updated_at: now
-    });
+    await apiCall('/api/update', { relic_id: relicId, ship_with_tracking: tracking });
     await loadAllRelics();
     showToast('Shipped');
   } catch (e) {
-    setStatus('Update failed: ' + e.message, true);
+    if (e.status !== 401) setStatus('Update failed: ' + e.message, true);
     showLoading(false);
   }
 }
 
 async function saveNotes(relicId, value) {
   try {
-    await restPatch(`/arkive_relics?id=eq.${encodeURIComponent(relicId)}`, {
-      fulfillment_notes: value,
-      updated_at: new Date().toISOString()
-    });
+    await apiCall('/api/update', { relic_id: relicId, notes: value });
     showToast('Notes saved');
   } catch (e) {
-    setStatus('Notes save failed: ' + e.message, true);
+    if (e.status !== 401) setStatus('Notes save failed: ' + e.message, true);
   }
 }
 
-function loadPhotos(relicId) {
-  const container = document.getElementById(`photos-${relicId}`);
+async function loadPhotos(relicId) {
+  const container = document.getElementById('photos-' + relicId);
   if (!container) return;
-  container.innerHTML = `
-    <div style="background:#FFF4E0;border:1px solid var(--accent);border-radius:6px;padding:10px 12px;margin:10px 0;font-size:12px;color:var(--text);">
-      <strong>Photo download URLs aren't available on this page.</strong>
-      Generating signed URLs for the print partner requires the Supabase service role, which can't run from a browser using the anon key.
-      Open this order in the Cowork artifact (which has access to the <code>relic-fulfillment-data</code> edge function) to load printable photos for relic <code>${escapeHtml(relicId)}</code>.
-    </div>`;
+  container.innerHTML = `<div class="muted tiny" style="margin-top:var(--space-3);">Generating signed URLs…</div>`;
+  try {
+    const data = await apiCall('/api/photos', { relic_id: relicId });
+    const photos = data.photos || [];
+    const meta = data.photos_meta || {};
+    if (photos.length === 0) {
+      container.innerHTML = `<div class="inline-msg">No photos found for this order.</div>`;
+      return;
+    }
+    photoCache[relicId] = { photos, expires_at: Date.now() + 3500 * 1000 };
+    const totalInCapsule = meta.total_in_capsule || photos.length;
+    const expectedCount = meta.expected_count || photos.length;
+    const warning = meta.selection_unknown ? `
+      <div class="inline-msg warn">
+        <strong>Legacy order — photo selection wasn't captured at order time.</strong>
+        This Relic was placed before 2026-05-06, when the iOS app started persisting customer selections.
+        Capsule contains <strong>${totalInCapsule}</strong> photo${totalInCapsule === 1 ? '' : 's'}; customer ordered <strong>${expectedCount}</strong> for printing.
+        Send all <strong>${totalInCapsule}</strong> photos to the print partner OR coordinate with the customer to identify the ${expectedCount} they wanted.
+      </div>` : `
+      <div class="inline-msg success">
+        ✓ Showing ${photos.length} customer-selected photo${photos.length === 1 ? '' : 's'} (filtered from ${totalInCapsule} in capsule). Signed URLs valid 1 hour.
+      </div>`;
+    container.innerHTML = `
+      ${warning}
+      <div class="actions" style="margin-top:var(--space-3);">
+        <button class="btn btn--secondary" onclick="downloadAllPhotos('${escapeHtml(relicId)}')">Download all (sequential)</button>
+        <button class="btn btn--secondary" onclick="copyAllPhotoUrls('${escapeHtml(relicId)}')">Copy all URLs</button>
+      </div>
+      <div class="photo-grid">
+        ${photos.map((p, i) => `
+          <a class="photo-tile" href="${escapeHtml(p.signed_url || '')}" target="_blank" rel="noopener" download="photo-${(i+1).toString().padStart(2,'0')}.jpg" title="Click to open + download photo ${i+1}">
+            <img src="${escapeHtml(p.signed_url || '')}" alt="Photo ${i+1}" loading="lazy" />
+            <span class="photo-tile-num">${i+1}</span>
+          </a>
+        `).join('')}
+      </div>
+    `;
+  } catch (e) {
+    if (e.status !== 401) container.innerHTML = `<div class="inline-msg error">Failed: ${escapeHtml(e.message)}</div>`;
+  }
 }
 
+window.copyAllPhotoUrls = function(relicId) {
+  const cache = photoCache[relicId];
+  if (!cache) { showToast('Load photos first.'); return; }
+  const urls = cache.photos.map((p, i) => `${(i+1).toString().padStart(2,'0')}: ${p.signed_url || ''}`).join('\n');
+  copyToClipboard(urls);
+};
+
+window.downloadAllPhotos = async function(relicId) {
+  const cache = photoCache[relicId];
+  if (!cache) { showToast('Load photos first.'); return; }
+  showToast(`Triggering ${cache.photos.length} downloads…`);
+  for (let i = 0; i < cache.photos.length; i++) {
+    const p = cache.photos[i];
+    if (!p.signed_url) continue;
+    const a = document.createElement('a');
+    a.href = p.signed_url;
+    a.download = `photo-${(i+1).toString().padStart(2,'0')}.jpg`;
+    a.target = '_blank';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    await new Promise(r => setTimeout(r, 400));
+  }
+  showToast('All download triggers fired.');
+};
+
 document.querySelectorAll('.filter-btn').forEach(btn => {
-  if (!btn.dataset.filter) return;
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.filter-btn').forEach(b => {
-      if (b.dataset.filter) b.classList.remove('active');
-    });
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     currentFilter = btn.dataset.filter;
     renderOrders();
   });
 });
 
-document.getElementById('reloadBtn').addEventListener('click', () => loadAllRelics());
+// Allow Enter key on login form
+document.getElementById('loginPass').addEventListener('keydown', (ev) => {
+  if (ev.key === 'Enter') doLogin();
+});
+document.getElementById('loginUser').addEventListener('keydown', (ev) => {
+  if (ev.key === 'Enter') document.getElementById('loginPass').focus();
+});
 
-document.getElementById('logoutBtn').addEventListener('click', async () => {
-  await signOut();
-  allRelics = [];
-  document.getElementById('orders').innerHTML = '';
-  document.getElementById('summaryRow').innerHTML = '';
-  setStatus('');
+// Boot
+if (getAuth()) {
+  hideLogin();
+  loadAllRelics();
+} else {
   showLogin();
-});
-
-document.getElementById('loginForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const email = document.getElementById('loginEmail').value.trim();
-  const password = document.getElementById('loginPassword').value;
-  const btn = document.getElementById('loginBtn');
-  const errEl = document.getElementById('loginError');
-  errEl.textContent = '';
-  if (!email || !password) {
-    errEl.textContent = 'Email and password are required.';
-    return;
-  }
-  btn.disabled = true;
-  btn.textContent = 'Signing in…';
-  try {
-    await signIn(email, password);
-    document.getElementById('loginPassword').value = '';
-    showDashboard();
-    await loadAllRelics();
-  } catch (err) {
-    errEl.textContent = err.message || 'Sign-in failed.';
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Sign in';
-  }
-});
-
-(function boot() {
-  const stored = loadStoredSession();
-  if (stored) {
-    session = stored;
-    showDashboard();
-    loadAllRelics();
-  } else {
-    clearStoredSession();
-    showLogin();
-  }
-})();
+}
 </script>
 
 </body>
