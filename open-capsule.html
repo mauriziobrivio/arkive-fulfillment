@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Open in Arkive — Your Capsule Awaits</title>
+
+    <!--
+      Smart App Banner. iOS Safari renders this as a native banner at
+      the top of the page when the app isn't installed. Replace the
+      placeholder app-id with the real App Store numeric ID once
+      published. The `app-argument` is forwarded to the app on tap if
+      the app *is* installed but Universal Links missed (e.g., user
+      pasted the URL into a non-Mail app).
+    -->
+    <meta name="apple-itunes-app" content="app-id=PLACEHOLDER_APP_STORE_ID, app-argument=https://arkive-it.app/open-capsule">
+
+    <meta name="theme-color" content="#0a0a0a">
+    <meta name="description" content="A capsule has been delivered for you. Download Arkive to open it.">
+
+    <style>
+        * { box-sizing: border-box; }
+        html, body { margin: 0; padding: 0; height: 100%; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: #0a0a0a;
+            color: #f4ede2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 32px 24px;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .container {
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+        }
+        .wordmark {
+            font-size: 12px;
+            letter-spacing: 5px;
+            font-weight: 300;
+            color: #9b7e5c;
+            text-transform: uppercase;
+            margin-bottom: 56px;
+        }
+        .hourglass {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 32px;
+            border: 1px solid rgba(155, 126, 92, 0.4);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: #9b7e5c;
+        }
+        h1 {
+            font-family: ui-serif, Georgia, "Times New Roman", serif;
+            font-size: 30px;
+            font-weight: 400;
+            line-height: 1.2;
+            margin: 0 0 16px;
+            color: #f4ede2;
+        }
+        h1 em {
+            font-style: italic;
+            color: #c9a870;
+        }
+        p.subhead {
+            font-size: 16px;
+            color: rgba(244, 237, 226, 0.6);
+            margin: 0 0 48px;
+            line-height: 1.6;
+        }
+        .cta-primary {
+            display: inline-block;
+            background: #c9a870;
+            color: #0a0a0a;
+            text-decoration: none;
+            padding: 18px 36px;
+            font-size: 13px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 600;
+            border-radius: 6px;
+            transition: transform 0.15s ease, opacity 0.15s ease;
+            min-width: 220px;
+        }
+        .cta-primary:active { transform: scale(0.98); opacity: 0.92; }
+        .cta-secondary {
+            display: inline-block;
+            margin-top: 20px;
+            color: rgba(244, 237, 226, 0.55);
+            font-size: 13px;
+            text-decoration: none;
+            padding: 8px 16px;
+        }
+        .cta-secondary:hover { color: #c9a870; }
+        .footer {
+            margin-top: 80px;
+            font-size: 11px;
+            color: rgba(244, 237, 226, 0.35);
+            letter-spacing: 1px;
+        }
+        .footer a {
+            color: rgba(244, 237, 226, 0.55);
+            text-decoration: none;
+            margin: 0 8px;
+        }
+        @media (max-width: 380px) {
+            h1 { font-size: 26px; }
+            .cta-primary { width: 100%; padding: 16px 24px; }
+        }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <div class="wordmark">ARKIVE</div>
+
+        <div class="hourglass">⏳</div>
+
+        <h1>A capsule is <em>waiting for you.</em></h1>
+
+        <p class="subhead">
+            Download Arkive on iPhone to open this capsule.<br>
+            If the app is already installed, this page should have redirected automatically.
+        </p>
+
+        <a href="https://apps.apple.com/app/arkive/idPLACEHOLDER_APP_STORE_ID" class="cta-primary" id="appStoreLink">
+            Download Arkive
+        </a>
+
+        <br>
+
+        <a href="#" class="cta-secondary" id="tryOpenAgain">Try opening in Arkive →</a>
+
+        <div class="footer">
+            <a href="https://arkive-it.app/privacy">Privacy</a>
+            ·
+            <a href="https://arkive-it.app/support">Support</a>
+        </div>
+    </main>
+
+    <script>
+        // If the app is installed but Universal Links somehow missed
+        // (rare — third-party browsers, copy-pasted URLs, in-app
+        // browsers like Instagram/Twitter), the user can tap "Try
+        // opening in Arkive" to invoke the custom scheme directly.
+        // We forward the same query string so DeepLinkHandler routes
+        // to the correct capsule.
+        document.getElementById('tryOpenAgain').addEventListener('click', function(e) {
+            e.preventDefault();
+            var qs = window.location.search || '';
+            // Custom scheme `arkive://open-capsule?...` — DeepLinkHandler
+            // accepts both this and the https://arkive-it.app form.
+            window.location.href = 'arkive://open-capsule' + qs;
+        });
+
+        // App Store link receives the current query string as a
+        // referrer hint so post-install attribution flows can pick up
+        // which capsule the user was trying to open.
+        var appStoreLink = document.getElementById('appStoreLink');
+        var qs = window.location.search || '';
+        if (qs) {
+            // Apple's Apps Store accepts ct (campaign token) for
+            // attribution — keep simple, just append our context.
+            appStoreLink.href = appStoreLink.href + '?ct=open-capsule';
+        }
+    </script>
+</body>
+</html>

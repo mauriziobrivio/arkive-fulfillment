@@ -1,0 +1,14 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [{
+      "appIDs": ["3QQXDZ9QAZ.com.brivio.ARKIVE"],
+      "components": [
+        { "/": "/open-capsule*" },
+        { "/": "/join-capsule*" },
+        { "/": "/join-vault*" },
+        { "/": "/relic*" }
+      ]
+    }]
+  }
+}
