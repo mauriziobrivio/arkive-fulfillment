@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mockup #15 — First-Tag CV3 Ceremony · Arkive Phase 0</title>
+  <link rel="stylesheet" href="../css/arkive-midfi.css">
+  <!--
+    Mockup #15 — First-ever person-tagged moment confirmation (CV3 ceremony).
+    Phase 0 mid-fi clickable prototype.
+
+    Owner: Design Lead (consolidated 2026-05-25)
+    Consumes Person-chip primitive v1.1.2 chip-detail variant + new
+      .fresh-tag treatment for the just-placed chip.
+
+    *** CV3 CEREMONY-PACE TREATMENT — applies ONLY to first-ever tag ***
+
+    Per CPO addendum + acceptance-criteria ratification:
+      - First-ever person-tag action: ~600ms confirmation animation,
+        subtle haptic, one-time inline message.
+      - Second tag forward: instant, silent. No animation, no message,
+        no haptic.
+
+    What this screen captures: the visual state DURING the ~600ms
+    confirmation. The newly-placed Liza chip-detail has a 2pt outline
+    (mid-fi approximation of a brief scale+fade entrance the iOS native
+    implementation would render). A confirmation banner sits below the
+    chip row, declaring the new tie.
+
+    Heirloom register copy:
+      "This moment is now tied to Liza in your Arkive."
+    One declarative sentence. No exclamation. No celebration. The word
+    "tied" carries the heirloom weight — it says "this connection now
+    exists and persists," not "you've successfully completed an action."
+
+    After ~600ms (NOT rendered in static mid-fi — documented here for
+    Builder inheritance), the banner fades out and the chip's 2pt
+    outline resolves to default state. The persistent state matches
+    exactly what users see on every subsequent moment with Liza
+    tagged. The ceremony resolves INTO the persistent state, not
+    presenting a different visual.
+
+    Surface context: this happens on a moment detail view (like #9)
+    immediately after a tagging action. Reusing #9's layout to
+    preserve visual continuity between "before tag" and "after tag"
+    — testers should recognize the moment as the same artifact they
+    were looking at when they tagged.
+
+    The "tied" framing parallels the heirloom-register choice for the
+    sealed confirmation in mockup #13 ("Sealed.") — both are
+    declarative one-liners marking acts that change the relationship
+    between user and the thing they're acting on. CV3 ceremony-pace
+    + CV1 tonal anchor in convergence.
+
+    Hotspot graph from this screen:
+      - Back arrow → mockup-05-moments-feed-default.html (after ceremony)
+      - Tab bar as elsewhere
+      - Liza chip-detail → mockup-07b-filter-applied-liza.html
+        (chip-detail tap behavior per spec §7.1 — filters to Liza)
+  -->
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="status-bar">9:41</div>
+
+    <div class="nav-bar">
+      <div class="nav-leading">
+        <a href="mockup-05-moments-feed-default.html"
+           class="nav-back hotspot"
+           aria-label="Back to Moments">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
+          <span>Moments</span>
+        </a>
+      </div>
+      <div class="nav-title"></div>
+      <div class="nav-trailing">
+        <div style="display:inline-flex; padding:4px; color:var(--text-primary);"
+             aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <circle cx="5" cy="12" r="1.2" fill="currentColor"/>
+            <circle cx="12" cy="12" r="1.2" fill="currentColor"/>
+            <circle cx="19" cy="12" r="1.2" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="scroll-area" style="padding:0;">
+      <div class="detail-content">
+
+        <div class="detail-date">April 12, 2026</div>
+
+        <div class="detail-title">For Alex, when he forgets</div>
+
+        <!-- Metadata row: kind badge + chip-detail row.
+             Liza chip has .fresh-tag state (2pt outline) — just placed. -->
+        <div class="detail-meta-row">
+          <span class="kind-badge">LETTER</span>
+          <div class="chip-detail-row">
+            <!-- Alex was already tagged; no fresh-tag state. -->
+            <a href="mockup-07-filter-applied-alex.html"
+               class="chip-detail hotspot"
+               style="text-decoration:none;">
+              <div class="avatar size-28 shade-3">A</div>
+              <span>Alex <span class="connection">— Brother</span></span>
+            </a>
+            <!-- Liza was just tagged — fresh-tag visual state. -->
+            <a href="mockup-07b-filter-applied-liza.html"
+               class="chip-detail fresh-tag hotspot"
+               style="text-decoration:none;"
+               title="Just tagged"
+               aria-label="Liza, just tagged">
+              <div class="avatar size-28 shade-2">L</div>
+              <span>Liza <span class="connection">— Wife</span></span>
+            </a>
+          </div>
+        </div>
+
+        <!-- CV3 confirmation banner. Heirloom register, declarative,
+             single sentence. Renders only on the first-ever tag for
+             the current Person; instant + silent thereafter. -->
+        <div class="first-tag-banner" role="status" aria-live="polite">
+          This moment is now tied to Liza in your Arkive.
+        </div>
+
+        <div class="detail-divider"></div>
+
+        <div class="detail-body">
+          <p>Alex,</p>
+
+          <p>
+            I want to tell you about the version of you I see in flashes —
+            the one who brought home stones and named them. The one who built
+            forts out of couch cushions and assigned me roles I never quite
+            understood. There was a seriousness to your play that I haven't
+            found a word for since.
+          </p>
+
+          <p>
+            Don't lose it. I know it doesn't feel like the kind of thing
+            you could lose. But the world will keep asking you to put it
+            down, and one day you might.
+          </p>
+
+          <p>
+            I hope when you open this, you remember.
+          </p>
+
+          <p class="signature">—Your brother</p>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="tab-bar">
+      <a href="mockup-05-moments-feed-default.html"
+         class="tab active hotspot"
+         style="display:flex; align-items:center; height:100%; padding:0 8px;">Moments</a>
+      <a href="mockup-10-send-flow-recipient-empty.html"
+         class="tab hotspot"
+         style="display:flex; align-items:center; height:100%; padding:0 8px;">Capsules</a>
+      <div class="tab">Relics</div>
+      <div class="tab">Vault</div>
+      <div class="tab">Profile</div>
+    </div>
+  </div>
+</body>
+</html>

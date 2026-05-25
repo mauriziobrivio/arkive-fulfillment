@@ -1,0 +1,1132 @@
+/* ============================================================
+   Arkive Phase 0 — Mid-Fi Prototype Stylesheet
+   Owner: Profile Design Lead (shared across all Phase 0 mockups)
+   Palette: grayscale only. Brand typography (serif) preserved.
+   Hi-fi color application is explicitly out of scope for Phase 0.
+   ============================================================ */
+
+:root {
+  /* Surfaces */
+  --bg-page:        #F5F5F5;
+  --bg-surface:     #FFFFFF;
+  --bg-subtle:      #FAFAFA;
+  --bg-pressed:     #EEEEEE;
+
+  /* Borders */
+  --border:         #E5E5E5;
+  --border-strong:  #CCCCCC;
+
+  /* Text */
+  --text-primary:   #1A1A1A;
+  --text-secondary: #666666;
+  --text-tertiary:  #999999;
+  --text-on-dark:   #FFFFFF;
+
+  /* Avatar deterministic shades (Person primitive §1.3) */
+  --avatar-1: #DDDDDD; /* Self always */
+  --avatar-2: #BBBBBB;
+  --avatar-3: #999999;
+  --avatar-4: #777777;
+  --avatar-5: #555555;
+  --avatar-ink-light: #1A1A1A; /* initial on avatar-1/2 */
+  --avatar-ink-dark:  #FFFFFF; /* initial on avatar-3/4/5 */
+
+  /* Type scale (iOS-style) */
+  --type-large-title: 32px;
+  --type-title-1: 28px;
+  --type-title-2: 22px;
+  --type-title-3: 20px;
+  --type-headline: 17px;
+  --type-body: 17px;
+  --type-callout: 16px;
+  --type-subhead: 15px;
+  --type-footnote: 13px;
+  --type-caption: 12px;
+  --type-caption-2: 11px;
+
+  /* Spacing */
+  --gap-1: 4px;
+  --gap-2: 8px;
+  --gap-3: 12px;
+  --gap-4: 16px;
+  --gap-5: 20px;
+  --gap-6: 24px;
+  --gap-7: 32px;
+  --gap-8: 40px;
+
+  /* Radii */
+  --radius-card: 14px;
+  --radius-row: 12px;
+  --radius-pill: 999px;
+
+  /* Brand serif stack — approximates iOS .design(.serif) on Apple devices */
+  --serif: 'Charter', 'Iowan Old Style', 'Apple Garamond', 'Source Serif Pro', 'Georgia', 'Times New Roman', serif;
+}
+
+/* ------------------------------------------------------------
+   Reset + base
+   ------------------------------------------------------------ */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  background: var(--bg-page);
+  color: var(--text-primary);
+  font-family: var(--serif);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+body { padding: 0; }
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; background: transparent; border: 0; color: inherit; }
+
+/* ------------------------------------------------------------
+   Phone frame (390 × 844 — iPhone 14 logical bounds)
+   ------------------------------------------------------------ */
+.phone-frame {
+  width: 390px;
+  min-height: 844px;
+  margin: 32px auto;
+  background: var(--bg-page);
+  border: 1px solid var(--border-strong);
+  border-radius: 36px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+}
+.phone-frame .status-bar {
+  height: 44px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+}
+.phone-frame .nav-bar {
+  height: 44px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--type-headline);
+}
+.phone-frame .nav-bar .nav-leading,
+.phone-frame .nav-bar .nav-trailing {
+  display: flex; align-items: center; gap: 8px;
+  color: var(--text-primary);
+}
+.phone-frame .nav-bar .nav-title {
+  font-size: var(--type-headline);
+  font-weight: 500;
+}
+.phone-frame .scroll-area {
+  padding: 0 16px 120px;
+}
+.phone-frame .tab-bar {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 320px;
+  height: 56px;
+  background: rgba(255,255,255,0.92);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  font-size: var(--type-caption);
+  color: var(--text-secondary);
+  backdrop-filter: blur(20px);
+}
+.phone-frame .tab-bar .tab.active { color: var(--text-primary); font-weight: 600; }
+
+/* ------------------------------------------------------------
+   Person primitive — avatars
+   ------------------------------------------------------------ */
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  font-family: var(--serif);
+  font-weight: 500;
+  user-select: none;
+  flex-shrink: 0;
+  position: relative;
+}
+.avatar.shade-1 { background: var(--avatar-1); color: var(--avatar-ink-light); }
+.avatar.shade-2 { background: var(--avatar-2); color: var(--avatar-ink-light); }
+.avatar.shade-3 { background: var(--avatar-3); color: var(--avatar-ink-dark); }
+.avatar.shade-4 { background: var(--avatar-4); color: var(--avatar-ink-dark); }
+.avatar.shade-5 { background: var(--avatar-5); color: var(--avatar-ink-dark); }
+
+/* Avatar sizes — match primitive density variants (v1.1) */
+.avatar.size-18  { width: 18px;  height: 18px;  font-size: 9px;  }  /* chip-overlay */
+.avatar.size-20  { width: 20px;  height: 20px;  font-size: 10px; }  /* deprecated (v1.0 chip-filter) */
+.avatar.size-24  { width: 24px;  height: 24px;  font-size: 11px; }  /* chip-filter */
+.avatar.size-28  { width: 28px;  height: 28px;  font-size: 12px; }  /* chip-detail */
+.avatar.size-32  { width: 32px;  height: 32px;  font-size: 14px; }  /* chip-suggestion */
+.avatar.size-56  { width: 56px;  height: 56px;  font-size: 22px; }  /* row-identity */
+.avatar.size-112 { width: 112px; height: 112px; font-size: 44px; }  /* hero-identity */
+
+/* Filter-active state — 2pt ring, 2pt offset */
+.avatar.filter-active {
+  box-shadow: 0 0 0 2px var(--bg-page), 0 0 0 4px var(--border-strong);
+}
+.avatar.pressed { opacity: 0.7; transition: opacity 120ms; }
+.avatar.disabled { opacity: 0.4; pointer-events: none; }
+
+/* ------------------------------------------------------------
+   Person primitive — chip-overlay (on moment cards)
+   ------------------------------------------------------------ */
+.chip-overlay-stack {
+  display: inline-flex;
+  align-items: center;
+}
+.chip-overlay-stack .avatar { margin-left: -6px; }  /* 18pt avatars: 6pt overlap */
+.chip-overlay-stack .avatar:first-child { margin-left: 0; }
+.chip-overlay-stack .avatar { box-shadow: 0 0 0 1.5px var(--bg-surface); }
+.chip-overlay-stack .overflow-plus {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--border); color: var(--text-primary);
+  font-family: var(--serif); font-size: 9px; font-weight: 500;
+  margin-left: -6px;
+  box-shadow: 0 0 0 1.5px var(--bg-surface);
+}
+
+/* ------------------------------------------------------------
+   Person primitive — chip-detail (moment detail view inline row)
+   28pt avatar + name + connection_label, horizontally scrollable row
+   ------------------------------------------------------------ */
+.chip-detail {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 12px 6px 6px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  font-family: var(--serif);
+  font-size: var(--type-footnote);
+  color: var(--text-primary);
+  flex-shrink: 0;
+}
+.chip-detail .connection { color: var(--text-secondary); }
+.chip-detail-row {
+  display: flex; gap: 8px;
+  overflow-x: auto;
+  padding: 8px 0;
+  scrollbar-width: none;
+}
+.chip-detail-row::-webkit-scrollbar { display: none; }
+
+/* ------------------------------------------------------------
+   Person primitive — chip-suggestion (auto-complete row)
+   ------------------------------------------------------------ */
+.chip-suggestion {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 14px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-row);
+}
+.chip-suggestion .label {
+  font-family: var(--serif);
+  font-size: var(--type-subhead);
+  color: var(--text-primary);
+}
+.chip-suggestion .label .connection {
+  color: var(--text-secondary);
+}
+
+/* ------------------------------------------------------------
+   Person primitive — chip-filter (active People filter pill)
+   ------------------------------------------------------------ */
+.chip-filter {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px 4px 4px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  font-family: var(--serif);
+  font-size: var(--type-footnote);
+  color: var(--text-primary);
+}
+.chip-filter .dismiss {
+  margin-left: 4px;
+  color: var(--text-tertiary);
+  font-size: 14px;
+  line-height: 1;
+}
+
+/* ------------------------------------------------------------
+   Person primitive — row-identity (People list row)
+   ------------------------------------------------------------ */
+.person-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  min-height: 72px;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+.person-row .person-text {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.person-row .name {
+  font-family: var(--serif);
+  font-size: var(--type-subhead);
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.person-row .connection {
+  font-family: var(--serif);
+  font-size: var(--type-footnote);
+  color: var(--text-secondary);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.person-row .connection.self-hint {
+  font-style: italic;
+  color: var(--text-tertiary);
+}
+.person-row .chevron {
+  color: var(--text-tertiary);
+  font-size: 18px;
+  line-height: 1;
+}
+
+/* ------------------------------------------------------------
+   Generic — section header
+   ------------------------------------------------------------ */
+.section-header {
+  font-family: var(--serif);
+  font-size: var(--type-footnote);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+  padding: 24px 4px 8px;
+}
+
+/* ------------------------------------------------------------
+   Generic — page hero (used by onboarding, empty states)
+   ------------------------------------------------------------ */
+.page-hero {
+  padding: 48px 8px 32px;
+}
+.page-hero .hero-title {
+  font-family: var(--serif);
+  font-size: var(--type-large-title);
+  font-weight: 500;
+  line-height: 1.15;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+.page-hero .hero-body p {
+  font-family: var(--serif);
+  font-size: var(--type-callout);
+  line-height: 1.45;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+/* ------------------------------------------------------------
+   Generic — CTA button
+   ------------------------------------------------------------ */
+.cta {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 100%;
+  height: 52px;
+  background: var(--text-primary);
+  color: var(--text-on-dark);
+  font-family: var(--serif);
+  font-size: var(--type-headline);
+  font-weight: 500;
+  border-radius: var(--radius-card);
+  cursor: pointer;
+}
+.cta.ghost {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border-strong);
+}
+.cta-secondary {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 8px 14px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--serif);
+  font-size: var(--type-subhead);
+  cursor: pointer;
+}
+
+/* ------------------------------------------------------------
+   Form field — used by send-flow recipient input
+   ------------------------------------------------------------ */
+.field {
+  display: flex; flex-direction: column; gap: 6px;
+  margin-bottom: 16px;
+}
+.field label {
+  font-family: var(--serif);
+  font-size: var(--type-footnote);
+  color: var(--text-secondary);
+}
+.field input,
+.field textarea {
+  font-family: var(--serif);
+  font-size: var(--type-body);
+  color: var(--text-primary);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-row);
+  padding: 12px 14px;
+  width: 100%;
+}
+.field input::placeholder { color: var(--text-tertiary); }
+
+/* ------------------------------------------------------------
+   Reference-page-only — grid display for the primitive catalog
+   ------------------------------------------------------------ */
+.ref-page { max-width: 820px; margin: 0 auto; padding: 48px 24px; }
+.ref-page h1 {
+  font-family: var(--serif); font-size: 28px; font-weight: 500;
+  margin-bottom: 8px;
+}
+.ref-page .ref-lede {
+  font-family: var(--serif); font-size: 16px; color: var(--text-secondary);
+  margin-bottom: 32px;
+}
+.ref-section {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 24px;
+  margin-bottom: 16px;
+}
+.ref-section h2 {
+  font-family: var(--serif); font-size: 18px; font-weight: 500;
+  margin-bottom: 4px;
+}
+.ref-section .ref-note {
+  font-family: var(--serif); font-size: 13px; color: var(--text-secondary);
+  margin-bottom: 16px;
+}
+.ref-row {
+  display: flex; align-items: center; gap: 24px;
+  padding: 12px 0;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.ref-row:first-of-type { border-top: 0; }
+.ref-row .ref-label {
+  min-width: 180px;
+  font-family: var(--serif); font-size: 13px; color: var(--text-tertiary);
+}
+
+/* ============================================================
+   === Profile additions ===
+   Maintained by Profile Design Lead.
+   Mirrored into this workspace by Capsule Lead 2026-05-24 (iteration 1)
+   as a defensive pre-merge during a bidirectional sync race.
+   Values reflect Profile Lead's tuned versions per her 2026-05-24
+   ack memo: gap (not margin-bottom) on uploader, parent text color
+   inheritance, 3-stop gradient on CTA bar.
+   If/when sync resolves and Profile Lead's canonical version arrives,
+   this block can be replaced verbatim by her definitions — no
+   substance loss either way.
+   ============================================================ */
+
+.avatar-uploader {
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  border: 1px dashed var(--border-strong);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin: 24px auto 32px;
+  color: var(--text-tertiary);
+  cursor: pointer;
+}
+.avatar-uploader .plus {
+  font-family: var(--serif);
+  font-size: 32px;
+  font-weight: 300;
+  line-height: 1;
+}
+.avatar-uploader .hint {
+  font-family: var(--serif);
+  font-size: var(--type-footnote);
+}
+
+.cta-bar {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  padding: 16px 20px 32px;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    var(--bg-page) 35%,
+    var(--bg-page) 100%
+  );
+}
+
+/* People list section (mockups #1, #2) */
+.people-list-section {
+  padding: 16px 0;
+}
+
+/* Empty body — CV2 three-layer heirloom-register copy (mockup #2) */
+.empty-body {
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.empty-body .empty-today {
+  font-family: var(--serif);
+  font-size: var(--type-callout);
+  color: var(--text-primary);
+  font-weight: 500;
+}
+.empty-body .empty-building {
+  font-family: var(--serif);
+  font-size: var(--type-callout);
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+.empty-body .empty-honest {
+  font-family: var(--serif);
+  font-size: var(--type-footnote);
+  color: var(--text-tertiary);
+  font-style: italic;
+  margin-top: 4px;
+}
+
+/* Person detail hero (mockup #3) — uses hero-identity 112pt avatar */
+.person-detail-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 24px 24px;
+  gap: 12px;
+  text-align: center;
+}
+.person-detail-hero .person-name {
+  font-family: var(--serif);
+  font-size: var(--type-title-1);
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-top: 8px;
+  line-height: 1.1;
+}
+.person-detail-hero .person-connection {
+  font-family: var(--serif);
+  font-size: var(--type-subhead);
+  color: var(--text-secondary);
+}
+.person-detail-hero .person-stats {
+  font-family: var(--serif);
+  font-size: var(--type-footnote);
+  color: var(--text-tertiary);
+  margin-top: 4px;
+}
+
+/* Tagged-moments section on PersonDetailView (mockup #3) */
+.tagged-moments-section {
+  padding: 20px 16px 16px;
+}
+.tagged-moments-section .tag-section-title {
+  font-family: var(--serif);
+  font-size: var(--type-footnote);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+  padding-left: 4px;
+}
+
+/* Settings list (mockup #4) */
+.settings-list {
+  padding: 16px;
+}
+.settings-row {
+  display: flex;
+  align-items: center;
+  padding: 16px 14px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-row);
+  margin-bottom: 8px;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+}
+.settings-row .row-label {
+  flex: 1;
+  font-family: var(--serif);
+  font-size: var(--type-body);
+  color: var(--text-primary);
+}
+.settings-row .row-meta {
+  font-family: var(--serif);
+  font-size: var(--type-footnote);
+  color: var(--text-tertiary);
+  margin-right: 8px;
+}
+.settings-row .chevron {
+  color: var(--text-tertiary);
+  font-size: 18px;
+  line-height: 1;
+}
+.settings-row.disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.settings-section-header {
+  font-family: var(--serif);
+  font-size: var(--type-footnote);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+  padding: 16px 8px 8px;
+}
+
+/* First-tag CV3 ceremony confirmation (mockup #15) */
+.first-tag-banner {
+  margin: 16px 16px 24px;
+  padding: 14px 18px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-row);
+  font-family: var(--serif);
+  font-size: var(--type-subhead);
+  color: var(--text-primary);
+  text-align: center;
+  line-height: 1.4;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+}
+.chip-detail.fresh-tag {
+  /* Subtle outline on a chip just placed by the user (CV3 first-tag).
+     Mid-fi approximation; real iOS uses a brief scale+fade animation
+     resolving from this state into default over ~600ms. */
+  box-shadow: 0 0 0 2px var(--text-primary);
+}
+
+/* ============================================================
+   === Capsule additions ===
+   Maintained by Capsule Design Lead.
+   Per Profile Lead's coordination memo (2026-05-24): direct edit
+   is fine; ratify only on collision risk. Classes below are
+   Capsule-scoped (Moments grid + tiles + send-flow + capsule UI).
+   No collision with Profile Lead's primitive classes.
+   ============================================================ */
+
+/* Moments grid container — 2-column square tiles */
+.moments-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding-top: 12px;
+}
+
+/* Moment tile base */
+.moment-tile {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  cursor: pointer;
+}
+
+/* Media-type tile backgrounds — grayscale only (no photography in mid-fi) */
+.moment-tile.kind-photo {
+  background: linear-gradient(135deg, #EAEAEA 0%, #C8C8C8 100%);
+}
+.moment-tile.kind-video {
+  background: linear-gradient(135deg, #4A4A4A 0%, #262626 100%);
+}
+.moment-tile.kind-audio {
+  background: var(--bg-subtle);
+}
+.moment-tile.kind-letter {
+  background: var(--bg-surface);
+}
+
+/* Centered media glyph (mid-fi placeholder; hi-fi = real media) */
+.moment-tile .tile-glyph {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.moment-tile .tile-glyph svg {
+  width: 40px;
+  height: 40px;
+}
+.moment-tile.kind-photo  .tile-glyph svg { color: rgba(255,255,255,0.55); }
+.moment-tile.kind-video  .tile-glyph svg { color: rgba(255,255,255,0.85); }
+.moment-tile.kind-audio  .tile-glyph svg { color: var(--text-tertiary); }
+.moment-tile.kind-letter .tile-glyph svg { color: var(--text-tertiary); }
+
+/* Bottom bar — chip stack (leading) + kind badge (trailing) per §10 contract */
+.moment-tile .tile-bottombar {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  padding: 8px 10px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 44px;
+  background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.45) 100%);
+}
+/* Light-background tiles: softer gradient to preserve tile fill */
+.moment-tile.kind-audio  .tile-bottombar,
+.moment-tile.kind-letter .tile-bottombar {
+  background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.18) 100%);
+}
+
+/* When a tile has zero people tagged (Self-only suppression per CPO matrix),
+   the bottom-leading slot is empty and the bar collapses — kind badge does
+   NOT migrate (§10 contract). */
+.moment-tile .tile-bottombar .chip-slot { display: inline-flex; }
+.moment-tile .tile-bottombar .chip-slot:empty { display: none; }
+
+/* Kind badge — existing pattern from PremiumContentCard.
+   9pt bold rounded, white text in 22% black capsule. Mid-fi preserves
+   the same visual weight; hi-fi color application is Phase 2. */
+.kind-badge {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Rounded',
+               'Helvetica Neue', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-on-dark);
+  background: rgba(0,0,0,0.55);
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+/* Filter affordance in nav bar — bare button, native iOS scale */
+.nav-bar .filter-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin: -4px;
+  color: var(--text-primary);
+}
+.nav-bar .filter-button svg { width: 22px; height: 22px; }
+
+/* Tap target padding for 18pt chip-overlay (per spec §7.1, ≥32×32pt logical) */
+.moment-tile .chip-overlay-stack a.chip-tap {
+  display: inline-block;
+  padding: 7px;
+  margin: -7px;
+  border-radius: 50%;
+}
+
+/* Hotspot affordance — cursor-only in mid-fi; no visual decoration */
+.hotspot { cursor: pointer; }
+
+/* ---- Sheet pattern ----
+   Used by:
+     - People filter sheet (mockup #6) — height 60%
+     - +N overflow sheet (interactive state of mockups #5/#7) — height 50%
+   Both consume Profile Lead's `row-identity` primitive in the body. */
+.sheet-scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.32);
+  z-index: 5;
+}
+.sheet {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  background: var(--bg-surface);
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  box-shadow: 0 -6px 32px rgba(0,0,0,0.10);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.sheet.height-60 { height: 60%; }
+.sheet.height-50 { height: 50%; }
+
+.sheet-handle {
+  width: 36px;
+  height: 5px;
+  background: var(--border-strong);
+  border-radius: 2.5px;
+  margin: 8px auto 4px;
+  flex-shrink: 0;
+}
+
+.sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px 14px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sheet-title {
+  font-family: var(--serif);
+  font-size: var(--type-headline);
+  font-weight: 500;
+  color: var(--text-primary);
+}
+.sheet-cancel {
+  font-family: var(--serif);
+  font-size: var(--type-body);
+  color: var(--text-secondary);
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.sheet-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 16px 24px;
+}
+.sheet-body .person-row {
+  /* Profile Lead's primitive — already styled in .person-row.
+     Sheet just inherits it. Reset margin if it adds vertical chrome. */
+  margin-bottom: 6px;
+}
+
+/* ---- Detail view layout ----
+   Used by mockup #9 (moment detail view). Single-column scrollable
+   page with serif typography per heirloom register. */
+
+.nav-bar .nav-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-primary);
+  font-family: var(--serif);
+  font-size: var(--type-headline);
+  cursor: pointer;
+}
+.nav-bar .nav-back svg { width: 18px; height: 18px; }
+
+.detail-content {
+  padding: 16px 20px 120px;
+}
+.detail-date {
+  font-family: var(--serif);
+  font-size: var(--type-footnote);
+  color: var(--text-tertiary);
+  margin-bottom: 8px;
+}
+.detail-title {
+  font-family: var(--serif);
+  font-size: var(--type-title-1);
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+.detail-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.detail-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 0 0 20px;
+}
+.detail-body {
+  font-family: var(--serif);
+  font-size: var(--type-body);
+  line-height: 1.55;
+  color: var(--text-primary);
+}
+.detail-body p {
+  margin-bottom: 1em;
+}
+.detail-body .signature {
+  margin-top: 1.4em;
+  font-style: italic;
+  color: var(--text-secondary);
+}
+
+/* Kind badge in detail context — same visual pattern as tile, since
+   testers recognize it from mockup #5. Sits on bg-page comfortably. */
+.detail-meta-row .kind-badge {
+  /* inherits .kind-badge above; no overrides needed */
+}
+
+/* ---- Empty state — feed with filter active, zero results ----
+   Mockup #8. Heirloom-register copy treatment per acceptance-criteria
+   ratification (Operations 2026-05-24). Three short declarative lines,
+   no exclamation, no marketing energy, no illustration in mid-fi. */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 80px 32px;
+  min-height: 380px;
+  gap: 12px;
+}
+.empty-state .empty-today {
+  font-family: var(--serif);
+  font-size: var(--type-callout);
+  color: var(--text-primary);
+  font-weight: 500;
+}
+.empty-state .empty-building {
+  font-family: var(--serif);
+  font-size: var(--type-callout);
+  color: var(--text-secondary);
+}
+.empty-state .empty-honest {
+  font-family: var(--serif);
+  font-size: var(--type-footnote);
+  color: var(--text-tertiary);
+  font-style: italic;
+  margin-top: 4px;
+}
+
+/* ---- Send flow chrome ----
+   Used by mockups #10–13. Step 1 (recipient) is the only step the
+   Phase 0 set demonstrates in detail; intermediate steps (cover,
+   content, reveal date) are compressed into a 'Continue → seal'
+   abstraction since they're outside the entity-elimination test scope.
+
+   Inherits Step 3 chrome conventions (Decision #94, Apr 30) and
+   Edit & Seal top-bar (Decision #116, May 9) where applicable;
+   neither was reopened by Frame δ. */
+
+.send-flow .nav-bar .nav-leading,
+.send-flow .nav-bar .nav-trailing {
+  font-family: var(--serif);
+  font-size: var(--type-body);
+}
+.send-flow .nav-bar .nav-leading a { color: var(--text-secondary); }
+.send-flow .nav-bar .nav-trailing a.disabled { color: var(--text-tertiary); }
+
+.send-flow-content {
+  padding: 24px 20px 140px;
+}
+
+.send-flow-prompt {
+  font-family: var(--serif);
+  font-size: var(--type-title-3);
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+.send-flow-subprompt {
+  font-family: var(--serif);
+  font-size: var(--type-footnote);
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+
+.recipient-field {
+  display: block;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-row);
+  padding: 14px 16px;
+  cursor: text;
+  margin-bottom: 12px;
+}
+.recipient-field .field-label {
+  font-family: var(--serif);
+  font-size: var(--type-footnote);
+  color: var(--text-tertiary);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.recipient-field .field-value {
+  font-family: var(--serif);
+  font-size: var(--type-body);
+  color: var(--text-primary);
+  min-height: 22px;
+}
+.recipient-field .field-value.placeholder {
+  color: var(--text-tertiary);
+  font-style: italic;
+}
+.recipient-field.focused {
+  border-color: var(--text-primary);
+}
+
+/* Caret simulator for the "typing" states (mockup #11/#12) */
+.caret {
+  display: inline-block;
+  width: 1px;
+  height: 1.1em;
+  background: var(--text-primary);
+  vertical-align: text-bottom;
+  margin-left: 1px;
+  animation: caret-blink 1s steps(2, jump-none) infinite;
+}
+@keyframes caret-blink {
+  to { opacity: 0; }
+}
+
+/* Suggestion list (chip-suggestion rows per primitive spec §2) */
+.suggestion-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+.suggestion-list .chip-suggestion {
+  /* Capsule Lead spec'd 60pt row height, 8pt gap (per v1.1 spec §10
+     "still open with Capsule Lead" — closed in ratification memo). */
+  min-height: 60px;
+}
+
+/* New-recipient inline confirmation block (mockup #12).
+   When user types a name/email that doesn't match any existing Person,
+   the system silently prepares to create a new Person row. NO interstitial,
+   NO "would you like to add this person?" dialog — per Frame δ. */
+.new-recipient-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 14px 16px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-row);
+}
+.new-recipient-block .new-recipient-line {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.new-recipient-block .new-recipient-line .label {
+  font-family: var(--serif);
+  font-size: var(--type-subhead);
+  color: var(--text-primary);
+}
+.new-recipient-block .new-recipient-line .label .meta {
+  color: var(--text-secondary);
+  font-size: var(--type-footnote);
+}
+.new-recipient-block .email-row {
+  font-family: var(--serif);
+  font-size: var(--type-footnote);
+  color: var(--text-secondary);
+}
+.new-recipient-block input.email-input {
+  font-family: var(--serif);
+  font-size: var(--type-body);
+  color: var(--text-primary);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin-top: 4px;
+}
+
+/* Test scaffolding affordance — visually distinct from production UI.
+   Used in mockup #10 to give the test administrator (Operations)
+   two clickable paths into the autocomplete and fresh-entry states.
+   Removable for production demo; kept for Phase 0 tester sessions. */
+.test-scaffolding {
+  margin-top: 32px;
+  padding: 12px 14px;
+  background: transparent;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-row);
+}
+.test-scaffolding .scaffolding-label {
+  font-family: var(--serif);
+  font-size: var(--type-caption);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+}
+.test-scaffolding a.scaffolding-link {
+  display: block;
+  font-family: var(--serif);
+  font-size: var(--type-subhead);
+  color: var(--text-secondary);
+  padding: 6px 0;
+  text-decoration: none;
+}
+.test-scaffolding a.scaffolding-link:hover {
+  color: var(--text-primary);
+}
+
+/* Sealed confirmation state — mockup #13.
+   Heirloom register: declarative, the moment is consequential but
+   not celebratory. No confetti, no exclamation. */
+.sealed-confirmation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 80px 32px 32px;
+  min-height: 420px;
+  gap: 16px;
+}
+.sealed-confirmation .seal-icon {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary);
+}
+.sealed-confirmation .seal-icon svg { width: 36px; height: 36px; }
+.sealed-confirmation .seal-title {
+  font-family: var(--serif);
+  font-size: var(--type-title-2);
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-top: 8px;
+}
+.sealed-confirmation .seal-meta {
+  font-family: var(--serif);
+  font-size: var(--type-callout);
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+.sealed-confirmation .seal-honest {
+  font-family: var(--serif);
+  font-size: var(--type-footnote);
+  color: var(--text-tertiary);
+  font-style: italic;
+  margin-top: 16px;
+  max-width: 280px;
+}
+

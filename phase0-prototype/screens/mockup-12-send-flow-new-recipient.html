@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mockup #12 — Send Flow: New Recipient (Mom) · Arkive Phase 0</title>
+  <link rel="stylesheet" href="../css/arkive-midfi.css">
+  <!--
+    Mockup #12 — Capsule send flow, Step 1 (recipient), fresh-entry state.
+    Phase 0 mid-fi clickable prototype.
+
+    Owner: Capsule Design Lead
+
+    *** STRATEGIC CRUX OF FRAME δ ***
+
+    Per acceptance-criteria ratification (Operations 2026-05-24):
+      "This is the strategic crux of Frame δ — the moment that
+       demonstrates the eliminated setup ceremony in lived behavior.
+       If it feels eventful, we've failed the design test on screen
+       before the user has a chance to fail the mental-model test."
+
+    CV3 ceremony-pace explicitly does NOT apply here. Silent inline
+    Person creation should feel like the OPPOSITE of a ceremony:
+    invisible, absorbed, non-eventful.
+
+    State demonstrated:
+      - User has typed "Mom" in the recipient field.
+      - No autocomplete match (Mom isn't in the user's People — Task 3b).
+      - Inline beneath the field, a quiet new-recipient block appears.
+      - The block shows Mom's auto-generated avatar (shade-4 per
+        deterministic hash) + her name + an email input.
+      - NO confirmation interstitial.
+      - NO "would you like to add Mom to your People?" dialog.
+      - NO explanatory prose framing the moment as significant.
+      - The block's mere appearance IS the system's silent
+        acknowledgment; nothing else is needed.
+
+    For test brevity in mid-fi (HTML can't simulate typing), the email
+    field is pre-filled with a plausible value. Tester taps Next to
+    complete the send. In production iOS, the tester would type the
+    email; the rest is identical.
+
+    Behind the scenes (not visible in mockup):
+      On Next tap, the system silently creates a Person row for Mom
+      with name "Mom" + email + auto-generated avatar shade. No
+      connection_label is set (Mom can be edited later in the People
+      list). The next time the send flow opens, Mom appears in
+      autocomplete just like Liza does in mockup #11 — that's where
+      the silent creation becomes visible, not here.
+
+    Hotspot graph from this screen:
+      - Cancel → mockup-05-moments-feed-default.html
+      - Next (enabled) → mockup-13-send-flow-sealed.html
+      - "Try Liza autocomplete instead" scaffolding link → mockup-11
+  -->
+</head>
+<body>
+  <div class="phone-frame send-flow">
+    <div class="status-bar">9:41</div>
+
+    <div class="nav-bar">
+      <div class="nav-leading">
+        <a href="mockup-05-moments-feed-default.html" class="hotspot"
+           style="color:var(--text-secondary);">Cancel</a>
+      </div>
+      <div class="nav-title">New Capsule</div>
+      <div class="nav-trailing">
+        <!-- Next is ENABLED once email is present. Mid-fi shows it black.
+             Hotspots to mockup-13b (sealed → Mom) per Flag #1
+             ratification — Task 3b sealed-state integrity. -->
+        <a href="mockup-13b-sealed-mom.html" class="hotspot"
+           style="color:var(--text-primary); font-weight:500;">Next</a>
+      </div>
+    </div>
+
+    <div class="scroll-area">
+      <div class="send-flow-content">
+
+        <div class="send-flow-prompt">Who is this for?</div>
+        <div class="send-flow-subprompt">
+          Pick someone from your People, or write a name and address you
+          haven't yet.
+        </div>
+
+        <!-- Recipient field — "Mom" typed, no autocomplete match -->
+        <div class="recipient-field focused">
+          <div class="field-label">To</div>
+          <div class="field-value">
+            Mom<span class="caret" aria-hidden="true"></span>
+          </div>
+        </div>
+
+        <!-- New-recipient block — silent inline expansion.
+             NO confirmation interstitial. NO explanatory prose.
+             The block's mere presence is the system response.
+             Mom's avatar uses shade-4 per deterministic hash of name.
+             No connection_label yet — set later if user wants. -->
+        <div class="new-recipient-block">
+          <div class="new-recipient-line">
+            <div class="avatar size-32 shade-4">M</div>
+            <div class="label">Mom</div>
+          </div>
+          <div style="margin-top:8px;">
+            <div class="email-row">Email</div>
+            <input class="email-input"
+                   type="email"
+                   value="mom@example.com"
+                   style="width:100%; box-sizing:border-box;"
+                   readonly />
+          </div>
+        </div>
+
+        <!-- Test scaffolding — alternate path back to Task 3a -->
+        <div class="test-scaffolding">
+          <div class="scaffolding-label">Phase 0 test paths</div>
+          <a href="mockup-11-send-flow-autocomplete.html"
+             class="scaffolding-link hotspot">
+            ›  Task 3a — instead type "Li" (Liza already exists in People)
+          </a>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="tab-bar">
+      <a href="mockup-05-moments-feed-default.html"
+         class="tab hotspot"
+         style="display:flex; align-items:center; height:100%; padding:0 8px;">Moments</a>
+      <div class="tab active">Capsules</div>
+      <div class="tab">Relics</div>
+      <div class="tab">Vault</div>
+      <div class="tab">Profile</div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mockup #1 — People List (Populated) · Arkive Phase 0</title>
+  <link rel="stylesheet" href="../css/arkive-midfi.css">
+  <!--
+    Mockup #1 — People list, populated state.
+    Phase 0 mid-fi clickable prototype.
+
+    Owner: Design Lead (consolidated 2026-05-25)
+    Consumes Person-chip primitive v1.1.2 row-identity variant (56pt
+      avatar + name + connection_label, per spec §6).
+
+    Test data: same People roster as mockups #5–#13.
+      Self at top (Maurizio) per spec #1 first-among-equals — "you"
+        italic hint on line 2 (no connection_label).
+      Liza — Wife
+      Alex — Brother
+      Mom — Mother
+      Sofia — Friend
+    The "Maurizio" Self row is visually distinct only via the "you"
+    hint; no separator rule between Self and others. First-among-
+    equals, not segregated.
+
+    Frame δ note: there is NO "Add person" affordance in nav-trailing.
+    The Frame δ change is that People appear in the user's Arkive
+    through natural acts (tagging a moment, sending a capsule).
+    Explicit manual add is deferred to a future surface (would be a
+    secondary path even if added; Phase 0 doesn't render it). This
+    absence IS the Frame δ statement on this screen.
+
+    Hotspot graph from this screen:
+      - Back arrow → mockup-04-settings-people.html (entry point)
+      - Liza row → mockup-03-person-detail-liza.html
+        (Liza chosen as the Person Detail demonstration per brief)
+      - Other rows → no hotspot (single PersonDetailView per brief)
+      - Tab bar: Profile is active (this surface is in Profile)
+  -->
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="status-bar">9:41</div>
+
+    <div class="nav-bar">
+      <div class="nav-leading">
+        <a href="mockup-04-settings-people.html"
+           class="hotspot"
+           style="color:var(--text-primary); display:inline-flex; align-items:center; gap:4px;
+                  font-family:var(--serif); font-size:var(--type-headline);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
+          Settings
+        </a>
+      </div>
+      <div class="nav-title">People</div>
+      <div class="nav-trailing"></div>
+    </div>
+
+    <div class="scroll-area">
+      <div class="people-list-section">
+
+        <!-- Self — first-among-equals. "you" italic hint on line 2. -->
+        <div class="person-row">
+          <div class="avatar size-56 shade-1">M</div>
+          <div class="person-text">
+            <div class="name">Maurizio</div>
+            <div class="connection self-hint">you</div>
+          </div>
+          <div class="chevron">›</div>
+        </div>
+
+        <!-- Liza — Wife. Hotspots to PersonDetailView mockup. -->
+        <a href="mockup-03-person-detail-liza.html"
+           class="person-row hotspot"
+           style="text-decoration:none; color:inherit;">
+          <div class="avatar size-56 shade-2">L</div>
+          <div class="person-text">
+            <div class="name">Liza</div>
+            <div class="connection">Wife</div>
+          </div>
+          <div class="chevron">›</div>
+        </a>
+
+        <!-- Alex — Brother -->
+        <div class="person-row">
+          <div class="avatar size-56 shade-3">A</div>
+          <div class="person-text">
+            <div class="name">Alex</div>
+            <div class="connection">Brother</div>
+          </div>
+          <div class="chevron">›</div>
+        </div>
+
+        <!-- Mom — Mother -->
+        <div class="person-row">
+          <div class="avatar size-56 shade-4">M</div>
+          <div class="person-text">
+            <div class="name">Mom</div>
+            <div class="connection">Mother</div>
+          </div>
+          <div class="chevron">›</div>
+        </div>
+
+        <!-- Sofia — Friend -->
+        <div class="person-row">
+          <div class="avatar size-56 shade-5">S</div>
+          <div class="person-text">
+            <div class="name">Sofia</div>
+            <div class="connection">Friend</div>
+          </div>
+          <div class="chevron">›</div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="tab-bar">
+      <a href="mockup-05-moments-feed-default.html"
+         class="tab hotspot"
+         style="display:flex; align-items:center; height:100%; padding:0 8px;">Moments</a>
+      <a href="mockup-10-send-flow-recipient-empty.html"
+         class="tab hotspot"
+         style="display:flex; align-items:center; height:100%; padding:0 8px;">Capsules</a>
+      <div class="tab">Relics</div>
+      <div class="tab">Vault</div>
+      <div class="tab active">Profile</div>
+    </div>
+  </div>
+</body>
+</html>

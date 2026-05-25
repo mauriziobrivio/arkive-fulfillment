@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mockup #5 — Moments Feed (Default) · Arkive Phase 0</title>
+  <link rel="stylesheet" href="../css/arkive-midfi.css">
+  <!--
+    Mockup #5 — Global Moments Feed, populated default state.
+    Phase 0 mid-fi clickable prototype.
+
+    Owner: Capsule Design Lead
+    Consumes Person-chip primitive v1.1 from Profile Design Lead.
+
+    Test data note:
+      People in user's list (per brief): Maurizio (Self), Liza (Wife),
+      Alex (Brother), Mom (Mother), Sofia (Friend).
+      Letters tagged to Alex: 3 (tiles 2, 5, 10) — supports Task 1.
+      Moments tagged to Liza: 5 mixed kinds (tiles 1, 3, 6, 7, 8) — supports Task 2.
+      Self-only moments (no chip per CPO matrix §4): tiles 4, 9.
+      Overflow demonstration (3 chips + "+1"): tile 7.
+
+    Hotspot graph from this screen:
+      - Nav-bar filter icon → mockup-06-people-filter-sheet.html
+      - Alex chip on any tile → mockup-07-filter-applied-alex.html (filter via chip path)
+      - Any tile → mockup-09-moment-detail.html (Task 1 path: tap letter → detail → tap Alex chip → filter)
+      - Capsules tab → mockup-10-send-flow-recipient-empty.html (Task 3 path)
+
+    Mental fiction: tester is presumed to have used the app for a while,
+    so the feed is populated. Per Founder's ratification of Option A
+    (populated mockup #5; suspend disbelief on first-launch framing
+    from onboarding handoff).
+  -->
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="status-bar">9:41</div>
+
+    <!-- Nav bar: title + filter affordance -->
+    <div class="nav-bar">
+      <div class="nav-leading"></div>
+      <div class="nav-title">Moments</div>
+      <div class="nav-trailing">
+        <a href="mockup-06-people-filter-sheet.html"
+           class="filter-button hotspot"
+           title="Filter by Person"
+           aria-label="Filter by Person">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 6h16M7 12h10M10 18h4"
+                  stroke="currentColor" stroke-width="1.5"
+                  stroke-linecap="round" />
+          </svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- Scroll area with 2-column moments grid -->
+    <div class="scroll-area">
+      <div class="moments-grid">
+
+        <!-- Tile 1 — Photo, tagged Liza + Maurizio (Self) -->
+        <a href="mockup-09-moment-detail.html"
+           class="moment-tile kind-photo hotspot">
+          <div class="tile-glyph">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M21 4H3a1 1 0 00-1 1v14a1 1 0 001 1h18a1 1 0 001-1V5a1 1 0 00-1-1zM5.5 17l3.5-4 2.5 3 4-5 4.5 6h-14.5z"/>
+            </svg>
+          </div>
+          <div class="tile-bottombar">
+            <div class="chip-overlay-stack chip-slot">
+              <div class="avatar size-18 shade-2" title="Liza">L</div>
+              <div class="avatar size-18 shade-1" title="Maurizio">M</div>
+            </div>
+          </div>
+        </a>
+
+        <!-- Tile 2 — Letter, tagged Alex (Task 1 target #1) -->
+        <a href="mockup-09-moment-detail.html"
+           class="moment-tile kind-letter hotspot">
+          <div class="tile-glyph">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="6" width="18" height="13" rx="1.5" />
+              <path d="M3 8l9 6 9-6" />
+            </svg>
+          </div>
+          <div class="tile-bottombar">
+            <div class="chip-overlay-stack chip-slot">
+              <a href="mockup-07-filter-applied-alex.html"
+                 class="chip-tap hotspot"
+                 title="Filter to Alex"
+                 aria-label="Filter to Alex">
+                <div class="avatar size-18 shade-3">A</div>
+              </a>
+            </div>
+            <span class="kind-badge">LETTER</span>
+          </div>
+        </a>
+
+        <!-- Tile 3 — Video, tagged Liza -->
+        <a href="mockup-09-moment-detail.html"
+           class="moment-tile kind-video hotspot">
+          <div class="tile-glyph">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 5v14l11-7L8 5z"/>
+            </svg>
+          </div>
+          <div class="tile-bottombar">
+            <div class="chip-overlay-stack chip-slot">
+              <div class="avatar size-18 shade-2" title="Liza">L</div>
+            </div>
+            <span class="kind-badge">VIDEO</span>
+          </div>
+        </a>
+
+        <!-- Tile 4 — Photo, Self-only (NO chip per CPO §4 matrix).
+             Photos have no kind badge, so bottom bar is omitted entirely
+             (graceful collapse per §10 contract — bar does not render
+             when both chip-slot and kind badge are absent). -->
+        <a href="mockup-09-moment-detail.html"
+           class="moment-tile kind-photo hotspot">
+          <div class="tile-glyph">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M21 4H3a1 1 0 00-1 1v14a1 1 0 001 1h18a1 1 0 001-1V5a1 1 0 00-1-1zM5.5 17l3.5-4 2.5 3 4-5 4.5 6h-14.5z"/>
+            </svg>
+          </div>
+        </a>
+
+        <!-- Tile 5 — Letter, tagged Alex (Task 1 target #2) -->
+        <a href="mockup-09-moment-detail.html"
+           class="moment-tile kind-letter hotspot">
+          <div class="tile-glyph">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="6" width="18" height="13" rx="1.5" />
+              <path d="M3 8l9 6 9-6" />
+            </svg>
+          </div>
+          <div class="tile-bottombar">
+            <div class="chip-overlay-stack chip-slot">
+              <a href="mockup-07-filter-applied-alex.html"
+                 class="chip-tap hotspot" title="Filter to Alex" aria-label="Filter to Alex">
+                <div class="avatar size-18 shade-3">A</div>
+              </a>
+            </div>
+            <span class="kind-badge">LETTER</span>
+          </div>
+        </a>
+
+        <!-- Tile 6 — Audio, tagged Liza -->
+        <a href="mockup-09-moment-detail.html"
+           class="moment-tile kind-audio hotspot">
+          <div class="tile-glyph">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.6" stroke-linecap="round">
+              <path d="M4 12h2M7 9v6M10 6v12M13 9v6M16 11v2M19 12h1" />
+            </svg>
+          </div>
+          <div class="tile-bottombar">
+            <div class="chip-overlay-stack chip-slot">
+              <div class="avatar size-18 shade-2" title="Liza">L</div>
+            </div>
+            <span class="kind-badge">AUDIO</span>
+          </div>
+        </a>
+
+        <!-- Tile 7 — Photo, tagged Alex + Liza + Maurizio + Sofia (3 + "+1" overflow) -->
+        <a href="mockup-09-moment-detail.html"
+           class="moment-tile kind-photo hotspot">
+          <div class="tile-glyph">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M21 4H3a1 1 0 00-1 1v14a1 1 0 001 1h18a1 1 0 001-1V5a1 1 0 00-1-1zM5.5 17l3.5-4 2.5 3 4-5 4.5 6h-14.5z"/>
+            </svg>
+          </div>
+          <div class="tile-bottombar">
+            <div class="chip-overlay-stack chip-slot">
+              <a href="mockup-07-filter-applied-alex.html"
+                 class="chip-tap hotspot" title="Filter to Alex" aria-label="Filter to Alex">
+                <div class="avatar size-18 shade-3">A</div>
+              </a>
+              <div class="avatar size-18 shade-2" title="Liza">L</div>
+              <div class="avatar size-18 shade-1" title="Maurizio">M</div>
+              <div class="overflow-plus" title="1 more person tagged">+1</div>
+            </div>
+          </div>
+        </a>
+
+        <!-- Tile 8 — Letter, tagged Liza (Task 2 target — letter to Liza) -->
+        <a href="mockup-09-moment-detail.html"
+           class="moment-tile kind-letter hotspot">
+          <div class="tile-glyph">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="6" width="18" height="13" rx="1.5" />
+              <path d="M3 8l9 6 9-6" />
+            </svg>
+          </div>
+          <div class="tile-bottombar">
+            <div class="chip-overlay-stack chip-slot">
+              <div class="avatar size-18 shade-2" title="Liza">L</div>
+            </div>
+            <span class="kind-badge">LETTER</span>
+          </div>
+        </a>
+
+        <!-- Tile 9 — Photo, Self-only (NO chip — second suppression demonstration).
+             Bar omitted (same graceful-collapse rule as tile 4). -->
+        <a href="mockup-09-moment-detail.html"
+           class="moment-tile kind-photo hotspot">
+          <div class="tile-glyph">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M21 4H3a1 1 0 00-1 1v14a1 1 0 001 1h18a1 1 0 001-1V5a1 1 0 00-1-1zM5.5 17l3.5-4 2.5 3 4-5 4.5 6h-14.5z"/>
+            </svg>
+          </div>
+        </a>
+
+        <!-- Tile 10 — Letter, tagged Alex (Task 1 target #3) -->
+        <a href="mockup-09-moment-detail.html"
+           class="moment-tile kind-letter hotspot">
+          <div class="tile-glyph">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="6" width="18" height="13" rx="1.5" />
+              <path d="M3 8l9 6 9-6" />
+            </svg>
+          </div>
+          <div class="tile-bottombar">
+            <div class="chip-overlay-stack chip-slot">
+              <a href="mockup-07-filter-applied-alex.html"
+                 class="chip-tap hotspot" title="Filter to Alex" aria-label="Filter to Alex">
+                <div class="avatar size-18 shade-3">A</div>
+              </a>
+            </div>
+            <span class="kind-badge">LETTER</span>
+          </div>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- Tab bar: Moments (active) + Capsules / Relics / Vault / Profile -->
+    <div class="tab-bar">
+      <div class="tab active">Moments</div>
+      <a href="mockup-10-send-flow-recipient-empty.html"
+         class="tab hotspot"
+         style="display:flex; align-items:center; height:100%; padding:0 8px;">Capsules</a>
+      <div class="tab">Relics</div>
+      <div class="tab">Vault</div>
+      <div class="tab">Profile</div>
+    </div>
+  </div>
+</body>
+</html>

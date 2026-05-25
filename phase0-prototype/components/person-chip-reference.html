@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Person-Chip Primitive v1.1.1 — Reference</title>
+  <link rel="stylesheet" href="../css/arkive-midfi.css">
+</head>
+<body>
+  <div class="ref-page">
+    <h1>Person-Chip Primitive — v1.1.1 Reference</h1>
+    <p class="ref-lede">
+      Mid-fi grayscale rendering of every density variant and state. Companion to
+      <code>PersonChip_Primitive_Spec.md</code> (version in header). Single source of truth —
+      Capsule Lead consumes this contract for moment-card chips, moment-detail chips,
+      send-flow auto-complete rows, and the chip-filter pill.
+    </p>
+
+    <!-- ============================================================
+         §1 — Avatar shades (deterministic per Person)
+         ============================================================ -->
+    <section class="ref-section">
+      <h2>§1.3 — Avatar shades</h2>
+      <p class="ref-note">
+        Self always renders as shade-1 (lightest). Other Persons hash into shades 2–5.
+        Distinguishes adjacent chips without using brand color (deferred to Phase 2).
+      </p>
+      <div class="ref-row">
+        <div class="ref-label">Five shades, 32pt size</div>
+        <div class="avatar size-32 shade-1">M</div>
+        <div class="avatar size-32 shade-2">L</div>
+        <div class="avatar size-32 shade-3">A</div>
+        <div class="avatar size-32 shade-4">M</div>
+        <div class="avatar size-32 shade-5">D</div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         §2 — Density variants
+         ============================================================ -->
+    <section class="ref-section">
+      <h2>§2 — Density variants (v1.1)</h2>
+      <p class="ref-note">
+        Six variants. Variant chosen by host surface, not by Person.
+        Sizes per Capsule Lead consumer requirements (received 2026-05-24).
+      </p>
+
+      <div class="ref-row">
+        <div class="ref-label">chip-overlay (18pt)<br>moment cards · Capsule A</div>
+        <div class="avatar size-18 shade-2">L</div>
+      </div>
+
+      <div class="ref-row">
+        <div class="ref-label">chip-detail (28pt)<br>moment detail view · Capsule B</div>
+        <div class="chip-detail">
+          <div class="avatar size-28 shade-2">L</div>
+          <span>Liza <span class="connection">— Wife</span></span>
+        </div>
+      </div>
+
+      <div class="ref-row">
+        <div class="ref-label">chip-suggestion (32pt)<br>send-flow auto-complete · Capsule C</div>
+        <div class="chip-suggestion" style="min-width:280px">
+          <div class="avatar size-32 shade-2">L</div>
+          <div class="label">Liza <span class="connection">— Wife</span></div>
+        </div>
+      </div>
+
+      <div class="ref-row">
+        <div class="ref-label">chip-filter (24pt)<br>active People filter pill</div>
+        <div class="chip-filter">
+          <div class="avatar size-24 shade-3">A</div>
+          <span>Alex</span>
+          <span class="dismiss">×</span>
+        </div>
+      </div>
+
+      <div class="ref-row">
+        <div class="ref-label">row-identity (56pt)<br>People list row · Profile #1</div>
+        <div class="person-row" style="width:340px">
+          <div class="avatar size-56 shade-2">L</div>
+          <div class="person-text">
+            <div class="name">Liza</div>
+            <div class="connection">Wife</div>
+          </div>
+          <div class="chevron">›</div>
+        </div>
+      </div>
+
+      <div class="ref-row">
+        <div class="ref-label">hero-identity (112pt)<br>PersonDetailView hero · Profile #3</div>
+        <div class="avatar size-112 shade-3">A</div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         §3 — States
+         ============================================================ -->
+    <section class="ref-section">
+      <h2>§3 — States</h2>
+      <p class="ref-note">
+        All states apply across variants. Demonstrated here on the 32pt avatar.
+      </p>
+      <div class="ref-row">
+        <div class="ref-label">default</div>
+        <div class="avatar size-32 shade-3">A</div>
+      </div>
+      <div class="ref-row">
+        <div class="ref-label">pressed (70% opacity)</div>
+        <div class="avatar size-32 shade-3 pressed">A</div>
+      </div>
+      <div class="ref-row">
+        <div class="ref-label">filter-active (2pt ring, 2pt offset)</div>
+        <div class="avatar size-32 shade-3 filter-active">A</div>
+      </div>
+      <div class="ref-row">
+        <div class="ref-label">disabled (40% opacity)</div>
+        <div class="avatar size-32 shade-3 disabled">A</div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         §5 — Overflow rule (up to 3 + "+N")
+         ============================================================ -->
+    <section class="ref-section">
+      <h2>§5 — Overflow rule</h2>
+      <p class="ref-note">
+        Up to 3 stacked, then "+N" indicator. Self takes its natural tag-order slot
+        — no layout privilege ("equals don't get layout privilege").
+      </p>
+
+      <div class="ref-row">
+        <div class="ref-label">1 person</div>
+        <div class="chip-overlay-stack">
+          <div class="avatar size-18 shade-2">L</div>
+        </div>
+      </div>
+      <div class="ref-row">
+        <div class="ref-label">2 persons</div>
+        <div class="chip-overlay-stack">
+          <div class="avatar size-18 shade-2">L</div>
+          <div class="avatar size-18 shade-3">A</div>
+        </div>
+      </div>
+      <div class="ref-row">
+        <div class="ref-label">3 persons</div>
+        <div class="chip-overlay-stack">
+          <div class="avatar size-18 shade-2">L</div>
+          <div class="avatar size-18 shade-3">A</div>
+          <div class="avatar size-18 shade-4">M</div>
+        </div>
+      </div>
+      <div class="ref-row">
+        <div class="ref-label">4 persons (3 + "+1")</div>
+        <div class="chip-overlay-stack">
+          <div class="avatar size-18 shade-2">L</div>
+          <div class="avatar size-18 shade-3">A</div>
+          <div class="avatar size-18 shade-4">M</div>
+          <div class="overflow-plus">+1</div>
+        </div>
+      </div>
+      <div class="ref-row">
+        <div class="ref-label">6 persons (3 + "+3")</div>
+        <div class="chip-overlay-stack">
+          <div class="avatar size-18 shade-2">L</div>
+          <div class="avatar size-18 shade-3">A</div>
+          <div class="avatar size-18 shade-4">M</div>
+          <div class="overflow-plus">+3</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         §4 — Self chip matrix (CPO addendum verbatim)
+         ============================================================ -->
+    <section class="ref-section">
+      <h2>§4 — Self chip matrix</h2>
+      <p class="ref-note">
+        Canonical. From CPO Phase 0 Clarifications Addendum.
+        Self uses shade-1 in every context where it renders.
+        No "(you)" suffix in chip contexts — the "you" affordance lives only on the People list row.
+      </p>
+      <div class="ref-row">
+        <div class="ref-label">Default feed, Self-only moment</div>
+        <div style="color:var(--text-tertiary); font-family:var(--serif); font-style:italic;">no chip rendered</div>
+      </div>
+      <div class="ref-row">
+        <div class="ref-label">Default feed, Self co-tagged with others</div>
+        <div class="chip-overlay-stack">
+          <div class="avatar size-18 shade-1">M</div>
+          <div class="avatar size-18 shade-2">L</div>
+        </div>
+      </div>
+      <div class="ref-row">
+        <div class="ref-label">People filter active (any), Self-only moment</div>
+        <div class="chip-overlay-stack">
+          <div class="avatar size-18 shade-1">M</div>
+        </div>
+      </div>
+      <div class="ref-row">
+        <div class="ref-label">Moment detail (full-screen)</div>
+        <div class="chip-overlay-stack">
+          <div class="avatar size-18 shade-1">M</div>
+          <div class="avatar size-18 shade-3">A</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         §6 — People list row (extended)
+         ============================================================ -->
+    <section class="ref-section">
+      <h2>§6 — People list row (extended)</h2>
+      <p class="ref-note">
+        Self row uses italic "you" hint on line 2 instead of a connection label.
+        No "Set Active" affordance on the row — that lives on PersonDetailView.
+        Trailing chevron signals push navigation.
+      </p>
+
+      <div class="ref-row" style="flex-direction:column; align-items:stretch; gap:0;">
+        <div class="person-row" style="max-width:380px">
+          <div class="avatar size-56 shade-1">M</div>
+          <div class="person-text">
+            <div class="name">Maurizio</div>
+            <div class="connection self-hint">you</div>
+          </div>
+          <div class="chevron">›</div>
+        </div>
+        <div class="person-row" style="max-width:380px">
+          <div class="avatar size-56 shade-2">L</div>
+          <div class="person-text">
+            <div class="name">Liza</div>
+            <div class="connection">Wife</div>
+          </div>
+          <div class="chevron">›</div>
+        </div>
+        <div class="person-row" style="max-width:380px">
+          <div class="avatar size-56 shade-3">A</div>
+          <div class="person-text">
+            <div class="name">Alex</div>
+            <div class="connection">Brother</div>
+          </div>
+          <div class="chevron">›</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         §7 — Tap behavior + long-press slot
+         ============================================================ -->
+    <section class="ref-section">
+      <h2>§7 — Tap behavior + long-press slot</h2>
+      <p class="ref-note">
+        Not rendered visually in the static reference — see spec §7 for full tables.
+        Critical for Phase 0 testing: chip-overlay tap = filter to that Person.
+        Long-press exposed as a consumer-filled slot (e.g., SwiftUI .contextMenu) so
+        menu items differ by context: re-tag in the feed; view-all-moments in the
+        moment detail; etc.
+      </p>
+    </section>
+
+    <!-- ============================================================
+         §10 — Moment-card chip stack render order
+         ============================================================ -->
+    <section class="ref-section">
+      <h2>§10 — Moment-card chip stack render order</h2>
+      <p class="ref-note">
+        Agreed jointly with Capsule Lead 2026-05-24 — coexistence with spatial separation.
+        Person chips bottom-leading. Kind badge + caption icon stay bottom-trailing.
+        Schematic below approximates a moment-card title bar (mid-fi only).
+      </p>
+
+      <div class="ref-row" style="flex-direction:column; align-items:stretch;">
+        <div style="
+          display:flex; align-items:center; justify-content:space-between;
+          width:300px; height:80px; padding:8px 12px;
+          background:linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.12) 100%);
+          border:1px solid var(--border); border-radius:var(--radius-card);
+          background-color:var(--bg-subtle);
+        ">
+          <!-- Bottom-leading: person-chip stack -->
+          <div class="chip-overlay-stack" style="align-self:flex-end;">
+            <div class="avatar size-18 shade-2">L</div>
+            <div class="avatar size-18 shade-3">A</div>
+            <div class="avatar size-18 shade-4">M</div>
+          </div>
+          <!-- Bottom-trailing: caption icon + kind badge -->
+          <div style="display:flex; align-items:center; gap:6px; align-self:flex-end;">
+            <span style="
+              font-size:11px; color:var(--text-secondary);
+              font-family:var(--serif);
+            ">⌶</span>
+            <span style="
+              font-size:9px; font-weight:700; letter-spacing:0.08em;
+              color:#FFF; background:rgba(0,0,0,0.55);
+              padding:3px 8px; border-radius:var(--radius-pill);
+              font-family:-apple-system, sans-serif;
+            ">LETTER</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mockup #4 — Settings (People section) · Arkive Phase 0</title>
+  <link rel="stylesheet" href="../css/arkive-midfi.css">
+  <!--
+    Mockup #4 — Settings page with People entry point.
+    Phase 0 mid-fi clickable prototype.
+
+    Owner: Design Lead (consolidated 2026-05-25)
+
+    The brief specifies "Settings → People section" — the address-book
+    treatment, reframed from per-Arkive setup to per-Person catalog
+    management. This is the settings page showing People as one of
+    several sections; tapping People navigates to the full list (#1).
+
+    Frame δ reframing: under the old model, this surface would have
+    surfaced "Your Arkives" or "Set up Arkives" — a configuration
+    surface for the per-recipient containers. Under Frame δ, that
+    surface is gone. People takes its place — a flat catalog of the
+    individuals in the user's life. The naming change ("Arkives" →
+    "People") is the load-bearing statement on this screen.
+
+    Other settings rows are visually rendered but non-interactive in
+    Phase 0 (they exist to anchor People in context — testers should
+    understand People is one of several settings sections, not a
+    standalone surface).
+
+    Hotspot graph from this screen:
+      - Back arrow → mockup-05-moments-feed-default.html
+        (settings is reached from the Profile tab; back returns to the
+         most plausible prior screen, the feed)
+      - People row → mockup-01-people-list-populated.html
+      - Other settings rows → no hotspot (non-interactive)
+      - Tab bar as elsewhere
+  -->
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="status-bar">9:41</div>
+
+    <div class="nav-bar">
+      <div class="nav-leading">
+        <a href="mockup-05-moments-feed-default.html"
+           class="hotspot"
+           style="color:var(--text-primary); display:inline-flex; align-items:center; gap:4px;
+                  font-family:var(--serif); font-size:var(--type-headline);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
+          Profile
+        </a>
+      </div>
+      <div class="nav-title">Settings</div>
+      <div class="nav-trailing"></div>
+    </div>
+
+    <div class="scroll-area">
+
+      <div class="settings-list">
+
+        <div class="settings-section-header">Account</div>
+
+        <div class="settings-row disabled">
+          <div class="row-label">Display Name</div>
+          <div class="row-meta">Maurizio</div>
+          <div class="chevron">›</div>
+        </div>
+
+        <div class="settings-row disabled">
+          <div class="row-label">Email</div>
+          <div class="row-meta">maurizio@…</div>
+          <div class="chevron">›</div>
+        </div>
+
+        <div class="settings-section-header">Your Arkive</div>
+
+        <!-- People row — the only interactive row in Phase 0. Hotspots
+             to the People list (mockup #1). -->
+        <a href="mockup-01-people-list-populated.html"
+           class="settings-row hotspot">
+          <div class="row-label">People</div>
+          <div class="row-meta">5</div>
+          <div class="chevron">›</div>
+        </a>
+
+        <div class="settings-row disabled">
+          <div class="row-label">Storage</div>
+          <div class="row-meta">2.1 GB</div>
+          <div class="chevron">›</div>
+        </div>
+
+        <div class="settings-section-header">Privacy & Security</div>
+
+        <div class="settings-row disabled">
+          <div class="row-label">Sharing</div>
+          <div class="chevron">›</div>
+        </div>
+
+        <div class="settings-row disabled">
+          <div class="row-label">Two-Factor Authentication</div>
+          <div class="chevron">›</div>
+        </div>
+
+        <div class="settings-section-header">About</div>
+
+        <div class="settings-row disabled">
+          <div class="row-label">Version</div>
+          <div class="row-meta">2026.5.24</div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="tab-bar">
+      <a href="mockup-05-moments-feed-default.html"
+         class="tab hotspot"
+         style="display:flex; align-items:center; height:100%; padding:0 8px;">Moments</a>
+      <a href="mockup-10-send-flow-recipient-empty.html"
+         class="tab hotspot"
+         style="display:flex; align-items:center; height:100%; padding:0 8px;">Capsules</a>
+      <div class="tab">Relics</div>
+      <div class="tab">Vault</div>
+      <div class="tab active">Profile</div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mockup #9 — Moment Detail (Letter to Alex) · Arkive Phase 0</title>
+  <link rel="stylesheet" href="../css/arkive-midfi.css">
+  <!--
+    Mockup #9 — Single moment opened (full-screen detail view).
+    Phase 0 mid-fi clickable prototype.
+
+    Owner: Capsule Design Lead
+    Consumes Person-chip primitive v1.1 chip-detail variant (28pt avatar
+      + inline name + connection_label) per spec §2 and §7.1.
+
+    Moment selected: a Letter to Alex. Rationale:
+      - Letter is one of the kinds testers will navigate to most directly
+        via Task 1 (find Alex's letters → tap a letter tile → detail).
+      - Single Person tag (Alex) keeps the chip row demonstration tight.
+        The chip-detail variant scales to N chips via horizontal scroll
+        (documented in spec §2, no need to demonstrate multi-chip here).
+      - Content is heirloom-register prose, declarative, no marketing
+        verbs, no exclamation. Calibrated tonally to mockup #8's empty-
+        state copy (both authored by Capsule Lead in CV1 tonal anchor).
+
+    Long-press affordance:
+      Per spec §7.2, chip-overlay and chip-detail expose .contextMenu as
+      a consumer-filled slot. In Phase 0 HTML this is documented but not
+      rendered (native iOS gesture; HTML approximation). The "Re-tag"
+      menu item would land here in iOS via:
+        PersonChip(person: alex, variant: .detail)
+            .contextMenu { Button("Re-tag") { ... } }
+      Builder inherits this from the spec, not from the mockup.
+
+    Self chip rule in this context: per CPO §4 matrix, the moment detail
+    view ALWAYS renders all tagged Persons including Self (no suppression
+    here). This moment isn't tagged to Self, so the question doesn't arise
+    on this particular screen, but the rule is in scope.
+
+    Hotspot graph from this screen:
+      - Back arrow → mockup-05-moments-feed-default.html
+      - Alex chip-detail → mockup-07-filter-applied-alex.html (spec §7.1
+          tap-to-filter; chip in 'default' state — would render
+          filter-active only if Alex were already the active filter,
+          which on a detail-view entry from default feed, he isn't)
+  -->
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="status-bar">9:41</div>
+
+    <!-- Nav bar: back to feed, optional trailing actions -->
+    <div class="nav-bar">
+      <div class="nav-leading">
+        <a href="mockup-05-moments-feed-default.html"
+           class="nav-back hotspot"
+           aria-label="Back to Moments">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
+          <span>Moments</span>
+        </a>
+      </div>
+      <div class="nav-title"></div>
+      <div class="nav-trailing">
+        <!-- More-actions menu (·· ·) — non-interactive in Phase 0 -->
+        <div style="display:inline-flex; padding:4px; color:var(--text-primary);"
+             aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <circle cx="5" cy="12" r="1.2" fill="currentColor"/>
+            <circle cx="12" cy="12" r="1.2" fill="currentColor"/>
+            <circle cx="19" cy="12" r="1.2" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scrollable detail content -->
+    <div class="scroll-area" style="padding:0;">
+      <div class="detail-content">
+
+        <div class="detail-date">April 12, 2026</div>
+
+        <div class="detail-title">For Alex, when he forgets</div>
+
+        <!-- Metadata row: kind badge + person chip(s).
+             Order mirrors moment-card grammar: kind on the left
+             (smaller, classification), person on the right (larger,
+             relational). In detail context the visual hierarchy
+             is reversed from the tile (chip is louder than badge)
+             because the person is the primary subject at this scale. -->
+        <div class="detail-meta-row">
+          <span class="kind-badge">LETTER</span>
+
+          <!-- chip-detail row: horizontally scrollable, here just one chip -->
+          <div class="chip-detail-row">
+            <a href="mockup-07-filter-applied-alex.html"
+               class="chip-detail hotspot"
+               style="text-decoration:none;"
+               title="Filter to Alex"
+               aria-label="Filter to Alex">
+              <div class="avatar size-28 shade-3">A</div>
+              <span>Alex <span class="connection">— Brother</span></span>
+            </a>
+          </div>
+        </div>
+
+        <div class="detail-divider"></div>
+
+        <!-- Letter body. Heirloom register: declarative, no exclamation,
+             no marketing energy. Short enough to scan but substantive
+             enough to feel like a real letter, not Lorem Ipsum. -->
+        <div class="detail-body">
+          <p>Alex,</p>
+
+          <p>
+            I want to tell you about the version of you I see in flashes —
+            the one who brought home stones and named them. The one who built
+            forts out of couch cushions and assigned me roles I never quite
+            understood. There was a seriousness to your play that I haven't
+            found a word for since.
+          </p>
+
+          <p>
+            Don't lose it. I know it doesn't feel like the kind of thing
+            you could lose. But the world will keep asking you to put it
+            down, and one day you might.
+          </p>
+
+          <p>
+            I hope when you open this, you remember.
+          </p>
+
+          <p class="signature">—Your brother</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Tab bar present but de-emphasized — detail view is modal-ish
+         on iOS but the bar still renders. Kept here for visual continuity
+         with the rest of the prototype. -->
+    <div class="tab-bar">
+      <a href="mockup-05-moments-feed-default.html"
+         class="tab active hotspot"
+         style="display:flex; align-items:center; height:100%; padding:0 8px;">Moments</a>
+      <a href="mockup-10-send-flow-recipient-empty.html"
+         class="tab hotspot"
+         style="display:flex; align-items:center; height:100%; padding:0 8px;">Capsules</a>
+      <div class="tab">Relics</div>
+      <div class="tab">Vault</div>
+      <div class="tab">Profile</div>
+    </div>
+  </div>
+</body>
+</html>

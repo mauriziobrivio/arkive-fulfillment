@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mockup #3 — Person Detail (Liza) · Arkive Phase 0</title>
+  <link rel="stylesheet" href="../css/arkive-midfi.css">
+  <!--
+    Mockup #3 — Person detail view (PersonDetailView, Liza).
+    Phase 0 mid-fi clickable prototype.
+
+    Owner: Design Lead (consolidated 2026-05-25)
+    Consumes Person-chip primitive v1.1.2 hero-identity variant (112pt
+      avatar, host renders label per spec §2 hero-identity note).
+
+    Test data: Liza is chosen as the demonstrated Person because she
+    has the richest connection to the user (5 moments tagged, mixed
+    kinds) and serves as the Task 2 secondary path (tester can reach
+    her detail from the People list to verify the model coherence
+    even if they're not running a target task here).
+
+    Stats line composition:
+      "5 moments • 1 capsule" — derived from test data.
+      5 moments: tiles 1, 3, 6, 7, 8 in mockup #5 (the populated feed).
+      1 capsule: implied by Task 3a sealed-to-Liza demonstration.
+
+    Tagged moments preview: small inline thumbnails of the 5 moments
+    tagged to Liza. Each links back to mockup-09 (the detail view
+    that represents "tap any moment to open it"). The grid is
+    compressed — not a full feed view; just a hint at "here's her
+    presence in your Arkive."
+
+    Hotspot graph from this screen:
+      - Back arrow → mockup-01-people-list-populated.html
+      - Any tagged-moment thumbnail → mockup-09-moment-detail.html
+      - Tab bar as elsewhere
+  -->
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="status-bar">9:41</div>
+
+    <div class="nav-bar">
+      <div class="nav-leading">
+        <a href="mockup-01-people-list-populated.html"
+           class="hotspot"
+           style="color:var(--text-primary); display:inline-flex; align-items:center; gap:4px;
+                  font-family:var(--serif); font-size:var(--type-headline);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
+          People
+        </a>
+      </div>
+      <div class="nav-title"></div>
+      <div class="nav-trailing"></div>
+    </div>
+
+    <div class="scroll-area" style="padding:0;">
+
+      <!-- Hero: 112pt avatar + name + connection_label + stats -->
+      <div class="person-detail-hero">
+        <div class="avatar size-112 shade-2">L</div>
+        <div class="person-name">Liza</div>
+        <div class="person-connection">Wife</div>
+        <div class="person-stats">5 moments · 1 capsule</div>
+      </div>
+
+      <!-- Tagged moments section — small preview grid of moments where
+           Liza appears. Three visible here; each links to detail view. -->
+      <div class="tagged-moments-section">
+        <div class="tag-section-title">Moments</div>
+        <div class="moments-grid">
+
+          <!-- Photo (Liza + Maurizio) -->
+          <a href="mockup-09-moment-detail.html" class="moment-tile kind-photo hotspot">
+            <div class="tile-glyph">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M21 4H3a1 1 0 00-1 1v14a1 1 0 001 1h18a1 1 0 001-1V5a1 1 0 00-1-1zM5.5 17l3.5-4 2.5 3 4-5 4.5 6h-14.5z"/>
+              </svg>
+            </div>
+            <div class="tile-bottombar">
+              <div class="chip-overlay-stack chip-slot">
+                <div class="avatar size-18 shade-2">L</div>
+                <div class="avatar size-18 shade-1">M</div>
+              </div>
+            </div>
+          </a>
+
+          <!-- Video (Liza) -->
+          <a href="mockup-09-moment-detail.html" class="moment-tile kind-video hotspot">
+            <div class="tile-glyph">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M8 5v14l11-7L8 5z"/>
+              </svg>
+            </div>
+            <div class="tile-bottombar">
+              <div class="chip-overlay-stack chip-slot">
+                <div class="avatar size-18 shade-2">L</div>
+              </div>
+              <span class="kind-badge">VIDEO</span>
+            </div>
+          </a>
+
+          <!-- Letter (Liza) -->
+          <a href="mockup-09-moment-detail.html" class="moment-tile kind-letter hotspot">
+            <div class="tile-glyph">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="6" width="18" height="13" rx="1.5" />
+                <path d="M3 8l9 6 9-6" />
+              </svg>
+            </div>
+            <div class="tile-bottombar">
+              <div class="chip-overlay-stack chip-slot">
+                <div class="avatar size-18 shade-2">L</div>
+              </div>
+              <span class="kind-badge">LETTER</span>
+            </div>
+          </a>
+
+          <!-- Audio (Liza) -->
+          <a href="mockup-09-moment-detail.html" class="moment-tile kind-audio hotspot">
+            <div class="tile-glyph">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="1.6" stroke-linecap="round">
+                <path d="M4 12h2M7 9v6M10 6v12M13 9v6M16 11v2M19 12h1" />
+              </svg>
+            </div>
+            <div class="tile-bottombar">
+              <div class="chip-overlay-stack chip-slot">
+                <div class="avatar size-18 shade-2">L</div>
+              </div>
+              <span class="kind-badge">AUDIO</span>
+            </div>
+          </a>
+
+        </div>
+      </div>
+
+    </div>
+
+    <div class="tab-bar">
+      <a href="mockup-05-moments-feed-default.html"
+         class="tab hotspot"
+         style="display:flex; align-items:center; height:100%; padding:0 8px;">Moments</a>
+      <a href="mockup-10-send-flow-recipient-empty.html"
+         class="tab hotspot"
+         style="display:flex; align-items:center; height:100%; padding:0 8px;">Capsules</a>
+      <div class="tab">Relics</div>
+      <div class="tab">Vault</div>
+      <div class="tab active">Profile</div>
+    </div>
+  </div>
+</body>
+</html>

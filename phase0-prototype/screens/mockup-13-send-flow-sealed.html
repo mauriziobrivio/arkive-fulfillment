@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mockup #13 — Send Flow: Sealed · Arkive Phase 0</title>
+  <link rel="stylesheet" href="../css/arkive-midfi.css">
+  <!--
+    Mockup #13 — Capsule send flow, sealed confirmation.
+    Phase 0 mid-fi clickable prototype.
+
+    Owner: Capsule Design Lead
+
+    State demonstrated:
+      The capsule has been sealed. Recipient and reveal date are confirmed.
+      The user has just performed an act of love (the framing from the
+      project instructions). The system acknowledges with gravity, not
+      celebration.
+
+    Heirloom register applied:
+      - "Sealed." — single declarative word as title. Not "Sealed!"
+        Not "Capsule sent!" Not "Done!" The period carries the weight.
+      - No confetti, no checkmark with animation, no exclamation.
+      - The honest-part line ("Until then, only you know it's waiting.")
+        anchors the wait without sentimentalizing it.
+
+    Recipient shown: Liza — Wife (consistent with Task 3a / mockup #11
+    autocomplete path). For Task 3b (Mom via mockup #12), the mockup
+    set has the same gap as the Liza-filter Task 2 path: only one
+    sealed-state mockup specced in the brief. Options:
+      1. Produce mockup #13b (sealed to Mom) as a sibling
+      2. Operations briefs testers that the recipient name shown is
+         representative; the seal happens for whomever they typed.
+    Resolution flagged to Operations alongside the mockup #7b flag.
+
+    The post-seal moment is also where the silent Person creation
+    (Frame δ crux) quietly confirms itself — per acceptance-criteria
+    ratification, the confirmation is via the NEXT send flow showing
+    the new Person available in autocomplete, not via celebration here.
+    This mockup doesn't render that confirmation; the next send flow
+    is outside the current mockup set.
+
+    Hotspot graph from this screen:
+      - Done CTA → mockup-05-moments-feed-default.html (return to feed)
+      - Tab bar same as elsewhere
+  -->
+</head>
+<body>
+  <div class="phone-frame send-flow">
+    <div class="status-bar">9:41</div>
+
+    <!-- No nav bar. The seal is the moment; back-navigation feels wrong.
+         User exits forward via the Done CTA. -->
+
+    <div class="scroll-area" style="padding:0;">
+      <div class="sealed-confirmation">
+
+        <!-- Sealed glyph — austere lock in a circle. Not a checkmark
+             (too iOS-celebratory), not a wax seal (too on-the-nose
+             for mid-fi). The circle + lock reads as "secured" without
+             festivity. -->
+        <div class="seal-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="5" y="11" width="14" height="9" rx="2" />
+            <path d="M8 11V8a4 4 0 018 0v3" />
+          </svg>
+        </div>
+
+        <div class="seal-title">Sealed.</div>
+
+        <div class="seal-meta">
+          To Liza — Wife.<br>
+          Opens May 24, 2027.
+        </div>
+
+        <div class="seal-honest">
+          Until then, only you know it's waiting.
+        </div>
+
+      </div>
+
+      <!-- Done CTA, lower-anchored. Returns to the Moments feed. -->
+      <div style="padding: 0 20px 32px;">
+        <a href="mockup-05-moments-feed-default.html"
+           class="cta hotspot"
+           style="text-decoration:none;">Done</a>
+      </div>
+    </div>
+
+    <div class="tab-bar">
+      <a href="mockup-05-moments-feed-default.html"
+         class="tab hotspot"
+         style="display:flex; align-items:center; height:100%; padding:0 8px;">Moments</a>
+      <div class="tab active">Capsules</div>
+      <div class="tab">Relics</div>
+      <div class="tab">Vault</div>
+      <div class="tab">Profile</div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mockup #11 — Send Flow: Autocomplete (Liza) · Arkive Phase 0</title>
+  <link rel="stylesheet" href="../css/arkive-midfi.css">
+  <!--
+    Mockup #11 — Capsule send flow, Step 1 (recipient), autocomplete state.
+    Phase 0 mid-fi clickable prototype.
+
+    Owner: Capsule Design Lead
+    Consumes Person-chip primitive v1.1 chip-suggestion variant (32pt
+      avatar + inline name + connection_label) per spec §2.
+
+    State demonstrated: user has typed "Li" — the autocomplete surfaces
+    "Liza — Wife" as a single matched suggestion. Caret renders inside
+    the recipient field to show input is active.
+
+    Per primitive spec §7.1 chip-suggestion tap behavior:
+      "Selects the Person as recipient (host surface handles selection)."
+    On tap: recipient locks to Liza, snapshot fields pre-fill, flow
+    advances. In Phase 0 compression, "advances" means jumps to
+    mockup #13 (sealed confirmation) — intermediate steps (cover,
+    content, reveal date) are outside test scope.
+
+    Test path served: Task 3a (Mom or Liza already exists in People).
+    Brief specifies Liza as the autocomplete demonstration target;
+    Operations applies the appropriate verbal framing if testing Task 3a
+    with a different Person ("imagine you typed Mom instead of Li and
+    Mom showed up the same way"). Cleaner alternative — Operations
+    runs Task 3a with Liza as target instead of Mom — Operations call.
+
+    Heirloom register: prompt language unchanged from mockup #10
+    ("Who is this for?"). No celebration of the match. The suggestion
+    row is a tool, not a moment.
+
+    Hotspot graph from this screen:
+      - Cancel → mockup-05-moments-feed-default.html
+      - Liza suggestion row tap → mockup-13-send-flow-sealed.html
+          (selects Liza + completes flow in one compressed action)
+      - "Type 'Mom' instead" scaffolding link → mockup-12-send-flow-new-recipient.html
+      - Tab bar: Moments → mockup-05; Capsules already active
+  -->
+</head>
+<body>
+  <div class="phone-frame send-flow">
+    <div class="status-bar">9:41</div>
+
+    <div class="nav-bar">
+      <div class="nav-leading">
+        <a href="mockup-05-moments-feed-default.html" class="hotspot"
+           style="color:var(--text-secondary);">Cancel</a>
+      </div>
+      <div class="nav-title">New Capsule</div>
+      <div class="nav-trailing">
+        <span class="disabled" aria-disabled="true">Next</span>
+      </div>
+    </div>
+
+    <div class="scroll-area">
+      <div class="send-flow-content">
+
+        <div class="send-flow-prompt">Who is this for?</div>
+        <div class="send-flow-subprompt">
+          Pick someone from your People, or write a name and address you
+          haven't yet.
+        </div>
+
+        <!-- Recipient field — user has typed "Li", caret is active -->
+        <div class="recipient-field focused">
+          <div class="field-label">To</div>
+          <div class="field-value">
+            Li<span class="caret" aria-hidden="true"></span>
+          </div>
+        </div>
+
+        <!-- Suggestion list — one match: Liza. Tapping the row selects
+             the Person as recipient + advances the flow. -->
+        <div class="suggestion-list">
+          <a href="mockup-13-send-flow-sealed.html"
+             class="chip-suggestion hotspot"
+             style="text-decoration:none; color:inherit;"
+             title="Select Liza as recipient"
+             aria-label="Select Liza as recipient">
+            <div class="avatar size-32 shade-2">L</div>
+            <div class="label">Liza <span class="connection">— Wife</span></div>
+          </a>
+        </div>
+
+        <!-- Test scaffolding — alternate path to Task 3b -->
+        <div class="test-scaffolding">
+          <div class="scaffolding-label">Phase 0 test paths</div>
+          <a href="mockup-12-send-flow-new-recipient.html"
+             class="scaffolding-link hotspot">
+            ›  Task 3b — instead type "Mom" (no autocomplete match)
+          </a>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="tab-bar">
+      <a href="mockup-05-moments-feed-default.html"
+         class="tab hotspot"
+         style="display:flex; align-items:center; height:100%; padding:0 8px;">Moments</a>
+      <div class="tab active">Capsules</div>
+      <div class="tab">Relics</div>
+      <div class="tab">Vault</div>
+      <div class="tab">Profile</div>
+    </div>
+  </div>
+</body>
+</html>

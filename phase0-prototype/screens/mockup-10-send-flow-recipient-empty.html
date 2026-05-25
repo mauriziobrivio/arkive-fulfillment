@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mockup #10 — Send Flow: Recipient Empty · Arkive Phase 0</title>
+  <link rel="stylesheet" href="../css/arkive-midfi.css">
+  <!--
+    Mockup #10 — Capsule send flow, Step 1 (recipient), empty state.
+    Phase 0 mid-fi clickable prototype.
+
+    Owner: Capsule Design Lead
+
+    Per item 7 confirmation (Operations 2026-05-24): this screen lives
+    inside Step 3 chrome (Decision #94, Apr 30) + Edit & Seal top-bar
+    (Decision #116, May 9). Neither was reopened by Frame δ — the
+    send-flow auto-complete is a new affordance landing INSIDE
+    the existing chrome, not a replacement for it.
+
+    Note: the brief mockup set demonstrates the RECIPIENT step only.
+    Intermediate steps (cover media, content selection, reveal date)
+    are compressed via the "Continue → seal" abstraction — those
+    surfaces are outside the entity-elimination test scope and would
+    add screens that don't earn their keep for Phase 0.
+
+    Verb framing per CPO addendum (clarifications, 2026-05-24):
+      Capsule send → "Who is this for?" (directional intent, not content type)
+
+    Test scaffolding (visually distinct from production UI, removable):
+      Two clickable paths in a dashed-border block at the bottom let
+      Operations drive testers through Task 3a (Liza autocomplete)
+      vs Task 3b (Mom fresh entry). Production UI would use real keyboard
+      input; mid-fi clickable HTML can't simulate typing, so the
+      scaffolding bridges the gap. Mark removable in cover note.
+
+    Hotspot graph from this screen:
+      - Cancel (nav-bar leading) → mockup-05-moments-feed-default.html
+      - Recipient field tap → mockup-11-send-flow-autocomplete.html
+          (default test path: tester taps to begin typing; lands on
+          the autocomplete state showing "Liza — Wife" suggestion)
+      - Scaffolding link "Task 3a — type 'Li'" → mockup-11-send-flow-autocomplete.html
+      - Scaffolding link "Task 3b — type 'Mom'" → mockup-12-send-flow-new-recipient.html
+      - Tab bar: Moments → mockup-05; Capsules already active
+  -->
+</head>
+<body>
+  <div class="phone-frame send-flow">
+    <div class="status-bar">9:41</div>
+
+    <!-- Nav bar: Cancel (left) + step indicator/title + Next placeholder -->
+    <div class="nav-bar">
+      <div class="nav-leading">
+        <a href="mockup-05-moments-feed-default.html" class="hotspot"
+           style="color:var(--text-secondary);">Cancel</a>
+      </div>
+      <div class="nav-title">New Capsule</div>
+      <div class="nav-trailing">
+        <span class="disabled" aria-disabled="true">Next</span>
+      </div>
+    </div>
+
+    <div class="scroll-area">
+      <div class="send-flow-content">
+
+        <div class="send-flow-prompt">Who is this for?</div>
+        <div class="send-flow-subprompt">
+          Pick someone from your People, or write a name and address you
+          haven't yet.
+        </div>
+
+        <!-- Recipient field — empty state. Tap to begin typing. -->
+        <a href="mockup-11-send-flow-autocomplete.html"
+           class="recipient-field hotspot"
+           style="text-decoration:none;"
+           title="Tap to enter recipient"
+           aria-label="Tap to enter recipient">
+          <div class="field-label">To</div>
+          <div class="field-value placeholder">Name or email…</div>
+        </a>
+
+        <!-- Test scaffolding: two paths into Task 3a / 3b. Removable. -->
+        <div class="test-scaffolding">
+          <div class="scaffolding-label">Phase 0 test paths</div>
+          <a href="mockup-11-send-flow-autocomplete.html"
+             class="scaffolding-link hotspot">
+            ›  Task 3a — type "Li" (Liza exists in People)
+          </a>
+          <a href="mockup-12-send-flow-new-recipient.html"
+             class="scaffolding-link hotspot">
+            ›  Task 3b — type "Mom" (no autocomplete match, silent inline creation)
+          </a>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="tab-bar">
+      <a href="mockup-05-moments-feed-default.html"
+         class="tab hotspot"
+         style="display:flex; align-items:center; height:100%; padding:0 8px;">Moments</a>
+      <div class="tab active">Capsules</div>
+      <div class="tab">Relics</div>
+      <div class="tab">Vault</div>
+      <div class="tab">Profile</div>
+    </div>
+  </div>
+</body>
+</html>

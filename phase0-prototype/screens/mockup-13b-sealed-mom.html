@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mockup #13b — Sealed (To Mom) · Arkive Phase 0</title>
+  <link rel="stylesheet" href="../css/arkive-midfi.css">
+  <!--
+    Mockup #13b — Capsule send flow, sealed confirmation (Mom).
+    Phase 0 mid-fi clickable prototype.
+
+    Sibling to mockup-13 (Liza). Produced 2026-05-24 (iteration 1)
+    per Flag #1 ratification — Task 3b sealed-state correctness.
+
+    Owner: Capsule Design Lead
+
+    State demonstrated:
+      The capsule has been sealed to Mom. Mom was silently created as
+      a Person row during the seal (per Frame δ — no interstitial,
+      no confirmation dialog — see mockup-12 for the inline-creation
+      moment itself).
+
+    Recipient shown: "Mom" — no em-dash, no connection_label per
+    Profile Lead's Q2 answer: "Empty state (no connection label set):
+    the field is hidden in chip contexts (no em-dash separator rendered
+    with nothing after it)." Mom was just silently created without a
+    connection_label; the user can set one later in the People list.
+
+    The post-seal moment is also where the silent Person creation
+    quietly confirms itself — per acceptance-criteria ratification, the
+    confirmation is via the NEXT send flow showing Mom available in
+    autocomplete, not via celebration here. This mockup doesn't render
+    that next-flow confirmation; it's outside the current set.
+
+    Heirloom register: same treatment as mockup-13.
+      - "Sealed." with period, not exclamation.
+      - "To Mom." declarative.
+      - "Until then, only you know it's waiting." — honest part anchors
+        the wait without sentimentalizing.
+
+    Hotspot graph from this screen:
+      - Done CTA → mockup-05-moments-feed-default.html
+      - Tab bar same as elsewhere
+  -->
+</head>
+<body>
+  <div class="phone-frame send-flow">
+    <div class="status-bar">9:41</div>
+
+    <div class="scroll-area" style="padding:0;">
+      <div class="sealed-confirmation">
+
+        <div class="seal-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="5" y="11" width="14" height="9" rx="2" />
+            <path d="M8 11V8a4 4 0 018 0v3" />
+          </svg>
+        </div>
+
+        <div class="seal-title">Sealed.</div>
+
+        <div class="seal-meta">
+          To Mom.<br>
+          Opens May 24, 2027.
+        </div>
+
+        <div class="seal-honest">
+          Until then, only you know it's waiting.
+        </div>
+
+      </div>
+
+      <div style="padding: 0 20px 32px;">
+        <a href="mockup-05-moments-feed-default.html"
+           class="cta hotspot"
+           style="text-decoration:none;">Done</a>
+      </div>
+    </div>
+
+    <div class="tab-bar">
+      <a href="mockup-05-moments-feed-default.html"
+         class="tab hotspot"
+         style="display:flex; align-items:center; height:100%; padding:0 8px;">Moments</a>
+      <div class="tab active">Capsules</div>
+      <div class="tab">Relics</div>
+      <div class="tab">Vault</div>
+      <div class="tab">Profile</div>
+    </div>
+  </div>
+</body>
+</html>

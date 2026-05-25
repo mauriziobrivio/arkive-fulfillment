@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mockup #2 — People List (New-User Empty) · Arkive Phase 0</title>
+  <link rel="stylesheet" href="../css/arkive-midfi.css">
+  <!--
+    Mockup #2 — People list, new-user empty state.
+    Phase 0 mid-fi clickable prototype.
+
+    Owner: Design Lead (consolidated 2026-05-25)
+
+    State demonstrated: first-launch People list. Only Self exists.
+    The user has just completed onboarding (mockup #14). They've
+    landed on Settings → People and there's no one here yet but them.
+
+    This is one of the four mandatory empty states per the original
+    brief. CV2 three-layer heirloom-register body copy below the
+    Self row explains the implicit-population model — People arrive
+    through natural acts (tagging, sending), not through explicit
+    setup. This screen IS the Frame δ statement: there's no
+    "Add People" CTA inviting upfront work.
+
+    Heirloom-register copy treatment:
+      Today:    "It's just you here."
+      Building: "People appear in your Arkive as you tag them in moments,
+                 or send them capsules."
+      Honest part: "No setup needed."
+
+    Three declarative lines, no exclamation, no marketing energy.
+    The "Honest part" line is the load-bearing Frame δ assertion —
+    it tells the user the setup ceremony doesn't exist, without
+    framing the absence as a feature.
+
+    Hotspot graph from this screen:
+      - Back arrow → mockup-04-settings-people.html
+      - Tab bar links as elsewhere
+  -->
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="status-bar">9:41</div>
+
+    <div class="nav-bar">
+      <div class="nav-leading">
+        <a href="mockup-04-settings-people.html"
+           class="hotspot"
+           style="color:var(--text-primary); display:inline-flex; align-items:center; gap:4px;
+                  font-family:var(--serif); font-size:var(--type-headline);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
+          Settings
+        </a>
+      </div>
+      <div class="nav-title">People</div>
+      <div class="nav-trailing"></div>
+    </div>
+
+    <div class="scroll-area">
+      <div class="people-list-section">
+
+        <!-- Self only — first-among-equals, but the only one here yet. -->
+        <div class="person-row">
+          <div class="avatar size-56 shade-1">M</div>
+          <div class="person-text">
+            <div class="name">Maurizio</div>
+            <div class="connection self-hint">you</div>
+          </div>
+          <div class="chevron">›</div>
+        </div>
+
+      </div>
+
+      <!-- CV2 three-layer body copy — heirloom register. -->
+      <div class="empty-body">
+        <div class="empty-today">It's just you here.</div>
+        <div class="empty-building">
+          People appear in your Arkive as you tag them in moments, or send
+          them capsules.
+        </div>
+        <div class="empty-honest">No setup needed.</div>
+      </div>
+
+    </div>
+
+    <div class="tab-bar">
+      <a href="mockup-05-moments-feed-default.html"
+         class="tab hotspot"
+         style="display:flex; align-items:center; height:100%; padding:0 8px;">Moments</a>
+      <a href="mockup-10-send-flow-recipient-empty.html"
+         class="tab hotspot"
+         style="display:flex; align-items:center; height:100%; padding:0 8px;">Capsules</a>
+      <div class="tab">Relics</div>
+      <div class="tab">Vault</div>
+      <div class="tab active">Profile</div>
+    </div>
+  </div>
+</body>
+</html>

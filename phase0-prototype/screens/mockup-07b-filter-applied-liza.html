@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mockup #7b — Moments Feed (Filter: Liza) · Arkive Phase 0</title>
+  <link rel="stylesheet" href="../css/arkive-midfi.css">
+  <!--
+    Mockup #7b — Global Moments feed with People filter applied to Liza.
+    Phase 0 mid-fi clickable prototype.
+
+    Sibling to mockup-07 (Alex). Produced 2026-05-24 (iteration 1)
+    per Flag #1 ratification — Task 2 sheet path test integrity.
+
+    Owner: Capsule Design Lead
+
+    Test data: moments tagged to Liza, drawn from mockup #5 source set.
+      Tile A — Photo tagged Liza+Maurizio (was tile #1 in mockup #5)
+      Tile B — Video tagged Liza (was tile #3)
+      Tile C — Audio tagged Liza (was tile #6)
+      Tile D — Photo tagged Alex+Liza+Maurizio+Sofia, 3+1 overflow (was tile #7)
+      Tile E — Letter tagged Liza (was tile #8)
+    Five moments total; mixed kinds (photo, video, audio, letter) — supports
+    Task 2's "everything about Liza or for Liza" framing better than a
+    homogeneous result would.
+
+    Liza chips on all visible tiles render in filter-active state (2pt
+    ring outside avatar per spec §3). Per spec §7.1 idempotent-tap rule
+    (v1.1.1), tapping a Liza chip on this view is a no-op; clearing
+    happens via the chip-filter pill × dismiss above the feed.
+
+    Hotspot graph from this screen:
+      - chip-filter × dismiss → mockup-05-moments-feed-default.html
+      - Any tile → mockup-09-moment-detail.html
+      - Capsules tab → mockup-10-send-flow-recipient-empty.html
+      - Filter nav-bar icon → mockup-06-people-filter-sheet.html
+  -->
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="status-bar">9:41</div>
+
+    <div class="nav-bar">
+      <div class="nav-leading"></div>
+      <div class="nav-title">Moments</div>
+      <div class="nav-trailing">
+        <a href="mockup-06-people-filter-sheet.html"
+           class="filter-button hotspot"
+           title="Change filter"
+           aria-label="Change filter">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 6h16M7 12h10M10 18h4"
+                  stroke="currentColor" stroke-width="1.5"
+                  stroke-linecap="round" />
+          </svg>
+        </a>
+      </div>
+    </div>
+
+    <div class="scroll-area">
+
+      <!-- Active filter pill — Liza (shade-2) -->
+      <div style="padding-top:12px;">
+        <a href="mockup-05-moments-feed-default.html"
+           class="chip-filter hotspot"
+           style="text-decoration:none;"
+           title="Clear filter"
+           aria-label="Clear filter">
+          <div class="avatar size-24 shade-2">L</div>
+          <span>Liza</span>
+          <span class="dismiss">×</span>
+        </a>
+      </div>
+
+      <div class="moments-grid">
+
+        <!-- Tile A — Photo, tagged Liza+Maurizio. Liza in filter-active. -->
+        <a href="mockup-09-moment-detail.html"
+           class="moment-tile kind-photo hotspot">
+          <div class="tile-glyph">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M21 4H3a1 1 0 00-1 1v14a1 1 0 001 1h18a1 1 0 001-1V5a1 1 0 00-1-1zM5.5 17l3.5-4 2.5 3 4-5 4.5 6h-14.5z"/>
+            </svg>
+          </div>
+          <div class="tile-bottombar">
+            <div class="chip-overlay-stack chip-slot">
+              <div class="avatar size-18 shade-2 filter-active" title="Liza (active filter)">L</div>
+              <div class="avatar size-18 shade-1" title="Maurizio">M</div>
+            </div>
+          </div>
+        </a>
+
+        <!-- Tile B — Video tagged Liza -->
+        <a href="mockup-09-moment-detail.html"
+           class="moment-tile kind-video hotspot">
+          <div class="tile-glyph">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 5v14l11-7L8 5z"/>
+            </svg>
+          </div>
+          <div class="tile-bottombar">
+            <div class="chip-overlay-stack chip-slot">
+              <div class="avatar size-18 shade-2 filter-active" title="Liza (active filter)">L</div>
+            </div>
+            <span class="kind-badge">VIDEO</span>
+          </div>
+        </a>
+
+        <!-- Tile C — Audio tagged Liza -->
+        <a href="mockup-09-moment-detail.html"
+           class="moment-tile kind-audio hotspot">
+          <div class="tile-glyph">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.6" stroke-linecap="round">
+              <path d="M4 12h2M7 9v6M10 6v12M13 9v6M16 11v2M19 12h1" />
+            </svg>
+          </div>
+          <div class="tile-bottombar">
+            <div class="chip-overlay-stack chip-slot">
+              <div class="avatar size-18 shade-2 filter-active" title="Liza (active filter)">L</div>
+            </div>
+            <span class="kind-badge">AUDIO</span>
+          </div>
+        </a>
+
+        <!-- Tile D — Photo tagged Alex+Liza+Maurizio+Sofia (3+1 overflow).
+             Liza in filter-active; Alex/M/+1 in default. -->
+        <a href="mockup-09-moment-detail.html"
+           class="moment-tile kind-photo hotspot">
+          <div class="tile-glyph">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M21 4H3a1 1 0 00-1 1v14a1 1 0 001 1h18a1 1 0 001-1V5a1 1 0 00-1-1zM5.5 17l3.5-4 2.5 3 4-5 4.5 6h-14.5z"/>
+            </svg>
+          </div>
+          <div class="tile-bottombar">
+            <div class="chip-overlay-stack chip-slot">
+              <div class="avatar size-18 shade-3" title="Alex">A</div>
+              <div class="avatar size-18 shade-2 filter-active" title="Liza (active filter)">L</div>
+              <div class="avatar size-18 shade-1" title="Maurizio">M</div>
+              <div class="overflow-plus" title="Sofia (1 more)">+1</div>
+            </div>
+          </div>
+        </a>
+
+        <!-- Tile E — Letter tagged Liza -->
+        <a href="mockup-09-moment-detail.html"
+           class="moment-tile kind-letter hotspot">
+          <div class="tile-glyph">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="6" width="18" height="13" rx="1.5" />
+              <path d="M3 8l9 6 9-6" />
+            </svg>
+          </div>
+          <div class="tile-bottombar">
+            <div class="chip-overlay-stack chip-slot">
+              <div class="avatar size-18 shade-2 filter-active" title="Liza (active filter)">L</div>
+            </div>
+            <span class="kind-badge">LETTER</span>
+          </div>
+        </a>
+
+      </div>
+    </div>
+
+    <div class="tab-bar">
+      <div class="tab active">Moments</div>
+      <a href="mockup-10-send-flow-recipient-empty.html"
+         class="tab hotspot"
+         style="display:flex; align-items:center; height:100%; padding:0 8px;">Capsules</a>
+      <div class="tab">Relics</div>
+      <div class="tab">Vault</div>
+      <div class="tab">Profile</div>
+    </div>
+  </div>
+</body>
+</html>

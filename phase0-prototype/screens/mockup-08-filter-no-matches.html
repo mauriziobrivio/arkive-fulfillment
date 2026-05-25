@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mockup #8 — Filter Active, No Matches · Arkive Phase 0</title>
+  <link rel="stylesheet" href="../css/arkive-midfi.css">
+  <!--
+    Mockup #8 — Global Moments feed: filter active, zero matches.
+    Phase 0 mid-fi clickable prototype.
+
+    Owner: Capsule Design Lead
+
+    Filter target: Sofia (Friend). Rationale for choosing Sofia:
+      - She's in the People list (visible in mockup #6 sheet) but has
+        no tagged moments, which is a realistic state for a recently-
+        added Person.
+      - Avoids cross-task confusion with Mom (who is loaded into Task 3
+        as a capsule recipient).
+      - Demonstrates the empty state without modifying any task-target
+        person's moment counts (Alex still has 4 moments for Task 1;
+        Liza still has 5 moments for Task 2).
+
+    Copy treatment — heirloom register, ratified by Operations:
+      Today layer:    "Filtered by Sofia."          (state what's filtered)
+      Building layer: "No moments tagged to Sofia yet." (gentle nudge)
+      Honest part:    "Tag a moment to her, and it'll appear here."
+                                                    (how to resolve)
+
+    Three short declarative lines. No exclamation. No marketing verbs.
+    No illustration in mid-fi. Italic on the honest-part line softens it.
+
+    The clear-filter affordance is the × on the chip-filter pill at top
+    (same gesture as on mockup #7). The empty-state copy does NOT
+    redundantly tell the user to clear the filter — that path is visible.
+    Heirloom register favors restraint over instruction.
+
+    Self chip rule: irrelevant here (no moments to render). Documented
+    for completeness — the rule would apply to chips on tiles, but the
+    feed is empty.
+
+    Hotspot graph from this screen:
+      - chip-filter × dismiss → mockup-05-moments-feed-default.html
+      - Filter nav-bar icon → mockup-06-people-filter-sheet.html
+        (lets tester change the filter target rather than clearing)
+      - Capsules tab → mockup-10-send-flow-recipient-empty.html
+      - Moments tab is already active (no nav)
+  -->
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="status-bar">9:41</div>
+
+    <!-- Nav bar -->
+    <div class="nav-bar">
+      <div class="nav-leading"></div>
+      <div class="nav-title">Moments</div>
+      <div class="nav-trailing">
+        <a href="mockup-06-people-filter-sheet.html"
+           class="filter-button hotspot"
+           title="Change filter"
+           aria-label="Change filter">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 6h16M7 12h10M10 18h4"
+                  stroke="currentColor" stroke-width="1.5"
+                  stroke-linecap="round" />
+          </svg>
+        </a>
+      </div>
+    </div>
+
+    <div class="scroll-area">
+
+      <!-- Active filter pill — Sofia (shade-5 per deterministic hash) -->
+      <div style="padding-top:12px;">
+        <a href="mockup-05-moments-feed-default.html"
+           class="chip-filter hotspot"
+           style="text-decoration:none;"
+           title="Clear filter"
+           aria-label="Clear filter">
+          <div class="avatar size-24 shade-5">S</div>
+          <span>Sofia</span>
+          <span class="dismiss">×</span>
+        </a>
+      </div>
+
+      <!-- Empty state body — CV1/CV2 heirloom-register copy.
+           Three lines, declarative, restrained. -->
+      <div class="empty-state">
+        <div class="empty-today">Filtered by Sofia.</div>
+        <div class="empty-building">No moments tagged to Sofia yet.</div>
+        <div class="empty-honest">Tag a moment to her, and it'll appear here.</div>
+      </div>
+
+    </div>
+
+    <!-- Tab bar -->
+    <div class="tab-bar">
+      <div class="tab active">Moments</div>
+      <a href="mockup-10-send-flow-recipient-empty.html"
+         class="tab hotspot"
+         style="display:flex; align-items:center; height:100%; padding:0 8px;">Capsules</a>
+      <div class="tab">Relics</div>
+      <div class="tab">Vault</div>
+      <div class="tab">Profile</div>
+    </div>
+  </div>
+</body>
+</html>

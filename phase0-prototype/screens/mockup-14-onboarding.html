@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=390, initial-scale=1">
+  <title>Mockup 14 — Onboarding (Tell us about you)</title>
+  <link rel="stylesheet" href="../css/arkive-midfi.css">
+</head>
+<body>
+
+  <!--
+    Mockup #14 — Onboarding "tell us about you"
+    ============================================
+    Owner: Profile Design Lead (primary). Capsule Lead reviews post-onboarding handoff.
+    Phase 0 prototype entry point. Continue CTA hotspots to mockup-05-moments-feed-default.html.
+
+    Substantive change from pre-Frame-δ onboarding: the "Set up your Arkives" step that
+    used to follow this screen is REMOVED, not rephrased. Onboarding ends here. User lands
+    directly at the Moments feed empty state.
+
+    Body copy uses CV2 three-layer narrative (Today / Building / Honest part) in
+    heirloom register. No marketing verbs, no exclamation, declarative.
+  -->
+
+  <div class="phone-frame">
+
+    <div class="status-bar">9:41</div>
+
+    <div class="scroll-area" style="padding-top: 8px;">
+
+      <div class="page-hero" style="padding-top: 24px; padding-bottom: 16px;">
+        <h1 class="hero-title">Tell us about you.</h1>
+
+        <div class="hero-body">
+          <!-- CV2 Layer 1 — Today -->
+          <p>
+            Your Arkive is yours alone — a private space for the moments worth keeping,
+            the messages worth sending later, and the documents worth protecting.
+          </p>
+
+          <!-- CV2 Layer 2 — Building -->
+          <p>
+            Over time, it grows into something durable: a body of work for the people
+            in your life, and a vault for what matters most.
+          </p>
+
+          <!-- CV2 Layer 3 — Honest part -->
+          <p>
+            It begins empty. What you put here is what it becomes.
+          </p>
+        </div>
+      </div>
+
+      <!-- Avatar (optional) — minimal Phase 0 affordance. No editor flow rendered. -->
+      <div class="avatar-uploader" title="Add a photo (optional)">
+        <span class="plus">+</span>
+        <span class="hint">Add a photo</span>
+      </div>
+
+      <!-- Display name — the only required field on this screen. -->
+      <div class="field" style="padding: 0 4px;">
+        <label>Your name</label>
+        <input type="text" placeholder="What should we call you?">
+      </div>
+
+    </div>
+
+    <!-- Continue CTA — hotspots to Capsule's mockup #5. Hot path for Phase 0 testing. -->
+    <div class="cta-bar">
+      <a class="cta" href="mockup-05-moments-feed-default.html">Continue</a>
+    </div>
+
+  </div>
+
+  <!--
+    Caption (non-rendered, for Operations/test-session orchestrators):
+    - Tester enters the prototype here.
+    - Continue is the only action. Hotspot resolves to the empty-state Moments feed.
+    - The absence of a "set up your Arkives" step IS the Frame δ change. The screen
+      should feel like a natural last beat of account creation, not a foreshortened flow.
+  -->
+</body>
+</html>
